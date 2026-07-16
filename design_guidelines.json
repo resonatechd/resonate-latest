@@ -1,0 +1,95 @@
+{
+  "theme": {
+    "mode": "light",
+    "description": "Professional, boutique consultancy, Dubai luxury real-estate vibe. No full black/dark, no purple gradients.",
+    "colors": {
+      "background": "#FDFBF7",
+      "foreground": "#1A1B1E",
+      "primary": "#C5A059",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#2C303A",
+      "secondary_foreground": "#FDFBF7",
+      "accent": "#E8E2D2",
+      "accent_foreground": "#1A1B1E",
+      "border": "#E2DCD0",
+      "surface": "#FFFFFF",
+      "surface_glass": "rgba(253, 251, 247, 0.85)"
+    },
+    "typography": {
+      "headings": {
+        "fontFamily": "Cormorant Garamond, serif",
+        "weights": ["400", "600", "700"],
+        "strategy": "Tight letter spacing (tracking-tighter) for massive headings. Use italic selectively for emphasis (e.g., 'Resonate.Dubai')."
+      },
+      "body": {
+        "fontFamily": "Manrope, sans-serif",
+        "weights": ["400", "500", "600"],
+        "strategy": "Warm humanist sans. Clean, legible, loose line-height (leading-relaxed)."
+      }
+    }
+  },
+  "layout": {
+    "spacing": "Generous spacing. Use p-8, p-12, p-16 to give elements breathing room. Containers should have generous internal padding.",
+    "grids": "Bento grids with asymmetry. Use grid-cols-1 md:grid-cols-12. The hero should be broken into uneven blocks.",
+    "borders": "1px solid #E2DCD0 or pure white with subtle shadow for cards."
+  },
+  "components": {
+    "hero": {
+      "structure": "Split or asymmetrical bento layout. Large typography, clear CTAs. High quality background image with bg-black/40 overlay to ensure text contrast if placed over image.",
+      "ctas": "Primary: Solid warm gold (#C5A059) pill or slightly rounded rectangle. Secondary: Outline dark."
+    },
+    "services_grid": {
+      "structure": "Asymmetric bento grid for 7 services. Some span 2 columns, others 1. Hover effects with slight lift (-translate-y-1) and shadow-lg.",
+      "visuals": "Use high-quality Phosphor or Lucide icons, sized large (w-8 h-8), colored in gold."
+    },
+    "multi_step_survey": {
+      "type": "Counselling Funnel instead of standard Contact Form",
+      "steps": [
+        "Location (Inside/Outside UAE)",
+        "Intent (Open Business / Find Job / Visit)",
+        "Education & Budget",
+        "Specific Job/Business Type",
+        "Contact Details (Name, Phone, Email)"
+      ],
+      "style": "Centered card with progress bar. Smooth transitions between steps. Uses Shadcn Form, Input, RadioGroup, Select."
+    },
+    "taxi_visa_section": {
+      "structure": "High impact callout. Large typography ('Trusted by 1000+ drivers'). Use yellow taxi image. Background could be the dark secondary color (#2C303A) with white text and gold accents."
+    },
+    "testimonials": {
+      "structure": "Static Google-style review cards. White card, 1px border, 5 gold stars, user avatar, name, 'powered by Google' text. Organized in a Marquee or Swiper carousel."
+    },
+    "dynamic_updates": {
+      "structure": "Masonry or feed layout. Admin can upload success stories or videos. Cards have 'New' badges, timestamps."
+    },
+    "admin_dashboard": {
+      "structure": "Protected route (/admin). Sidebar navigation (Submissions, Updates). Data tables (Shadcn Table) for survey submissions. Forms to upload updates.",
+      "style": "Clean, dense data layout (Mode B high-density grid)."
+    }
+  },
+  "images": {
+    "skyline": "https://images.unsplash.com/photo-1651467606797-e1c660cf3fda?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxkdWJhaSUyMHNreWxpbmUlMjBsdXh1cnl8ZW58MHx8fHwxNzg0MjE4OTUwfDA&ixlib=rb-4.1.0&q=85",
+    "handshake": "https://images.unsplash.com/photo-1521791136064-7986c2920216?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwyfHxidXNpbmVzcyUyMGhhbmRzaGFrZSUyMG9mZmljZXxlbnwwfHx8fDE3ODQyMTg5NTB8MA&ixlib=rb-4.1.0&q=85",
+    "passports": "https://images.unsplash.com/photo-1553697388-94e804e2f0f6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NjZ8MHwxfHNlYXJjaHwyfHxwYXNzcG9ydCUyMHRyYXZlbCUyMHZpc2F8ZW58MHx8fHwxNzg0MjE4OTUwfDA&ixlib=rb-4.1.0&q=85",
+    "taxi": "https://images.unsplash.com/photo-1630717285906-29364ffacea0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwyfHx5ZWxsb3clMjB0YXhpJTIwY2FyfGVufDB8fHx8MTc4NDIxODk1MHww&ixlib=rb-4.1.0&q=85",
+    "team_member_1": "https://images.pexels.com/photos/4797690/pexels-photo-4797690.jpeg",
+    "team_member_2": "https://images.pexels.com/photos/14589344/pexels-photo-14589344.jpeg"
+  },
+  "libraries": {
+    "icons": "lucide-react or @phosphor-icons/react",
+    "motion": "framer-motion, react-fast-marquee",
+    "forms": "react-hook-form, zod, @hookform/resolvers"
+  },
+  "instructions_to_main_agent": "Ensure you strictly follow the .js file extensions instead of .tsx. Add data-testid to every interactive component (buttons, forms, links) for testability. Use Cormorant Garamond for main headings, Manrope for the body. Maintain luxury, high-end real-estate/consultancy vibe. Incorporate the multi-step counselling survey exactly as outlined. DO NOT use fully transparent backgrounds for headers over images - use glassmorphism with solid color bases.",
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not use generic centered layouts or simplistic gradients.",
+    "Always use data-testid on interactive elements.",
+    "Do not use pure black backgrounds.",
+    "Use generous spacing (p-8 to p-24) to create a premium feel.",
+    "Do not use 'transition: all', specify targeted transitions.",
+    "Do not center align the app container globally in CSS.",
+    "Do not use transparent header over images; use solid or crystal glass (backdrop-blur-xl bg-white/80 or bg-black/60).",
+    "Use .js files for React components, NOT .tsx.",
+    "Never use generic AI emojis in UI text."
+  ]
+}
