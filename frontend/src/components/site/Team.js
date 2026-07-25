@@ -1,3 +1,26 @@
+import { useState } from "react";
+
+function TeamPhoto({ name, src }) {
+  const [errored, setErrored] = useState(false);
+  const initials = name.split(" ").filter(Boolean).map((n) => n.charAt(0)).slice(0, 2).join("");
+  return (
+    <div className="aspect-[4/5] overflow-hidden bg-[#E8E2D2] relative">
+      {!errored ? (
+        <img
+          src={src}
+          alt={name}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          onError={() => setErrored(true)}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center font-serif-display text-6xl italic text-[#C5A059]/70">
+          {initials}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const TEAM = [
   {
     name: "Mr. R. Khanna",
@@ -54,17 +77,7 @@ export default function Team() {
               className="group border hairline bg-white overflow-hidden flex flex-col"
               data-testid={`team-${t.name.toLowerCase().replace(/[^a-z]+/g, "-")}`}
             >
-              <div className="aspect-[4/5] overflow-hidden bg-[#E8E2D2] relative">
-                <img
-                  src={t.img}
-                  alt={t.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                  onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement.dataset.fallback = t.name.charAt(0); }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center font-serif-display text-6xl italic text-[#C5A059]/60 pointer-events-none opacity-0 [[data-fallback]_&]:opacity-100">
-                  {t.name.split(" ").map((n) => n.charAt(0)).slice(0, 2).join("")}
-                </div>
-              </div>
+              <TeamPhoto name={t.name} src={t.img} />
               <div className="p-5 flex-1 flex flex-col">
                 <h3 className="font-serif-display text-xl leading-tight">{t.name}</h3>
                 <p className="text-[10px] uppercase tracking-widest text-[#C5A059] mt-1">{t.role}</p>

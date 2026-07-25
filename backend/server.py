@@ -27,7 +27,7 @@ from fastapi import (
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, field_validator
 
 # --- Config ---
 MONGO_URL = os.environ["MONGO_URL"]
@@ -205,6 +205,13 @@ class SurveyIn(BaseModel):
     visa_status: Optional[str] = None
     field_or_type: Optional[str] = None
     experience_years: Optional[str] = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def _empty_email_to_none(cls, v):
+        if v in ("", None):
+            return None
+        return v
 
 
 class VacancyIn(BaseModel):
@@ -449,13 +456,28 @@ async def survey_upload(file: UploadFile = File(...)):
 
 @api.get("/files/{path:path}")
 async def download_file(path: str):
+    # Check updates first (public media)
     record = await db.updates.find_one(
         {"media_path": path, "is_deleted": {"$ne": True}}
     )
-    if not record:
-        raise HTTPException(status_code=404, detail="File not found")
+    ct_fallback = None
+    if record:
+        ct_fallback = record.get("media_type")
+    else:
+        # Check survey uploads (passport files)
+        upload = await db.survey_uploads.find_one({"path": path})
+        if not upload:
+            # Or referenced by a survey
+            survey_ref = await db.surveys.find_one({
+                "$or": [{"passport_front_path": path}, {"passport_back_path": path}]
+            })
+            if not survey_ref:
+                raise HTTPException(status_code=404, detail="File not found")
+            ct_fallback = None
+        else:
+            ct_fallback = upload.get("content_type")
     data, ct = get_object(path)
-    return Response(content=data, media_type=record.get("media_type") or ct)
+    return Response(content=data, media_type=ct_fallback or ct)
 
 
 # --- Admin routes ---
