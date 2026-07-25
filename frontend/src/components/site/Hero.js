@@ -58,7 +58,7 @@ export default function Hero() {
             <div className="absolute inset-0 bg-gradient-to-t from-[#2C303A]/60 via-transparent to-transparent" />
             <div className="absolute bottom-6 left-6 right-6 text-white">
               <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Head Office</p>
-              <p className="font-serif-display text-2xl leading-tight mt-1">Compass Co-Working, Al Hamra,<br/>Ras Al Khaimah, UAE</p>
+              <p className="font-serif-display text-2xl leading-tight mt-1">Compass Co-Working Space,<br/>Al Jazeera Al Hamra, Ras Al Khaimah, UAE</p>
             </div>
           </div>
           <div className="absolute -bottom-6 -left-6 bg-[#2C303A] text-white p-6 max-w-[220px] hidden lg:block">

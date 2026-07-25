@@ -30,6 +30,9 @@ export default function About() {
               </div>
             ))}
           </dl>
+          <p className="text-xs text-muted-foreground mt-8">
+            Compass Co-Working Space, Al Jazeera Al Hamra Industry, Ras Al Khaimah, United Arab Emirates.
+          </p>
         </div>
       </div>
     </section>

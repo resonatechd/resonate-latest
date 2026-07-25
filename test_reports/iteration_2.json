@@ -1,0 +1,40 @@
+{
+  "summary": "Iteration 2 of Resonate.Dubai LLC tested end-to-end. Backend: 10/10 pytest cases pass (health, reviews x8, vacancies public seeded incl. 'Taxi Driver — Sharjah', admin auth guard on /vacancies/all, admin create+delete vacancy propagates to public list, survey submit minimal + full, admin survey list, survey/upload). Frontend: services=5, team=5 (names match), clients=8, partners=7, footer address contains 'Compass Co-Working Space, Al Jazeera Al Hamra Industry'. Admin dashboard shows 3 tabs; vacancy add/delete + submission detail dialog all working via new data-testids. One CRITICAL survey submission bug found (empty email string causes 422). One broken team image (sobti.jpg) not present in /public/team/.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "POST /api/survey/submit", "issue": "SurveyIn.email is Optional[EmailStr] but frontend always sends email='' (initial state) — pydantic rejects empty string with 422 'must have an @-sign'. Result: any user who does not fill the optional email cannot submit the survey. Playwright end-to-end submit reproduced 422. Repro: curl -X POST /api/survey/submit -d '{\"name\":\"x\",\"phone\":\"+91123\",\"intent\":\"job\",\"email\":\"\"}' → 422.", "priority": "CRITICAL"}
+    ],
+    "minor": [
+      {"endpoint": "GET /api/files/{path}", "issue": "Endpoint only resolves paths stored on db.updates; passport files uploaded via /api/survey/upload are recorded in db.survey_uploads and are NOT downloadable via /api/files/. Admin detail dialog links to /api/files/{passport_front_path} which will 404. Fix: also look up survey_uploads (and/or surveys.passport_*_path) to authorise download."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Team", "issue": "Missing image /team/sobti.jpg (naturalWidth=0). Other 4 members render correctly. Fallback initials show but appears as broken vs real photo.", "selector": "team-ms-s-sobti img", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [
+      {"flow": "Survey submission", "issue": "Survey submit fails with 422 whenever the optional email field is left blank because the frontend defaults email='' and sends it as-is. Fix in frontend: strip empty strings before POST (or in backend: coerce '' → None via validator).", "affected_selectors": ["[data-testid=survey-submit]"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "CRITICAL: Fix survey submit 422 when email is empty. Recommended: add a Pydantic field_validator on SurveyIn.email to convert empty string to None, OR strip empty optional strings in the frontend submit payload.",
+    "Add /public/team/sobti.jpg (or update Team.js to use fallback initials cleanly) — sobti.jpg currently 404s.",
+    "Extend /api/files/{path} lookup to include survey_uploads so admin can view uploaded passport files."
+  ],
+  "critical_code_review_comments": [
+    "SurveyIn.email uses Optional[EmailStr] but no empty-string coercion — direct source of the 422 bug.",
+    "/api/files/{path:path} enforces auth-through-obscurity by requiring a matching updates record; it silently blocks legitimate passport downloads.",
+    "CORS is set with allow_origins='*' and allow_credentials=False in server.py — acceptable for public API but note if cookies are ever added.",
+    "server.py hits 550+ lines; consider splitting routers (auth, survey, vacancies, updates) into modules soon."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (10/10 pytest)", "frontend": "~85% (survey blocked by email 422 bug; all other flows verified)"},
+  "test_credentials": "admin@resonate.dubai / Admin@123 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "Two TEST_ survey submissions created via API and one TEST_ vacancy add/delete via UI (deleted).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All new v2 behaviours (5 services, 5 team, 8+7 clients/partners, footer address, vacancies CRUD, admin submissions detail dialog, survey 5-slide) are wired. The only blocker is the email='' 422 bug on /api/survey/submit — after fix, re-run backend_test.py and re-verify UI end-to-end survey submission with all-optional-blank flow.",
+  "rca of the issue": "Frontend SurveyForm.js keeps `email: ''` in `initial` state and always sends the full `data` object to POST /api/survey/submit. Backend Pydantic model SurveyIn.email is `Optional[EmailStr] = None`. Pydantic v2 treats empty string '' as an invalid email (must contain @), so the endpoint returns 422 even though the field is optional. Two-line fix options: (a) backend — add `@field_validator('email', mode='before') def _empty_to_none(v): return v or None`; (b) frontend — before submit, `Object.fromEntries(Object.entries(data).filter(([_,v]) => v !== ''))`. Recommend the backend fix as it also guards against similar issues for other optional string fields sent as ''."
+}

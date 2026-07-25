@@ -20,7 +20,7 @@ export default function Footer() {
             UAE-registered business consultancy delivering trade license, visa, corporate tax and manpower solutions across the Emirates. Trade license valid until March 2027.
           </p>
           <div className="mt-8 space-y-3 text-sm">
-            <p className="flex items-start gap-3"><MapPin className="w-4 h-4 text-[#C5A059] mt-0.5" /> Compass Co-Working, Al Hamra,<br />Ras Al Khaimah, UAE</p>
+            <p className="flex items-start gap-3"><MapPin className="w-4 h-4 text-[#C5A059] mt-0.5" /> Compass Co-Working Space,<br />Al Jazeera Al Hamra Industry,<br />Ras Al Khaimah, United Arab Emirates</p>
             <p className="flex items-center gap-3"><Mail className="w-4 h-4 text-[#C5A059]" /> hello@resonate.dubai</p>
             <p className="flex items-center gap-3"><Phone className="w-4 h-4 text-[#C5A059]" /> +971 00 000 0000</p>
           </div>

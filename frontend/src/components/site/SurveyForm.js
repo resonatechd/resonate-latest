@@ -1,31 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Progress } from "../ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCheck } from "lucide-react";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "../ui/select";
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCheck, Upload } from "lucide-react";
 import api, { formatApiError } from "../../lib/api";
 import { toast } from "sonner";
 
 const TOTAL = 5;
 
+const INDIAN_STATES = [
+  "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana",
+  "Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur",
+  "Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana",
+  "Tripura","Uttar Pradesh","Uttarakhand","West Bengal",
+  "Andaman & Nicobar Islands","Chandigarh","Dadra & Nagar Haveli and Daman & Diu",
+  "Delhi","Jammu & Kashmir","Ladakh","Lakshadweep","Puducherry",
+];
+
+const INDUSTRIES = [
+  "Tourism & Hospitality","Restaurant / Kitchen","Waitering / Front-of-house","Housekeeping",
+  "Taxi Driver","Bike Rider (Delivery)","Truck Driver","Warehouse & Logistics",
+  "Retail Sales","Real Estate Sales","Marketing / Digital Marketing","Website / App Development",
+  "Accountant / Finance","Admin / Office Support","Customer Service","Human Resources",
+  "Mechanical Engineering","Civil Engineering","Electrical Engineering","IT Support / Networking",
+  "Manufacturing / Factory","Construction","Cleaning Services","Security","Healthcare / Nursing",
+  "Beauty / Salon","Automotive Repair","Teaching / Training","Media / Content","Other",
+];
+
+const EDU_DETAIL = {
+  "10th": ["General 10th pass"],
+  "12th": ["Science","Commerce","Arts","Diploma / ITI"],
+  Graduation: ["BA","B.Com","BSc","BBA","B.Tech / Engineering","BCA","Other Bachelor's"],
+  "Post-Graduation": ["MA","M.Com","MSc","MBA","M.Tech","MCA","Other Master's","PhD"],
+};
+
 const initial = {
-  location: "",
-  intent: "",
-  visa_status: "",
-  education: "",
-  field_or_type: "",
-  budget: "",
-  timeline: "",
-  experience_years: "",
   name: "",
-  email: "",
+  age: "",
   phone: "",
-  nationality: "",
+  state: "",
+  has_passport: "",
+  passport_front_path: "",
+  passport_back_path: "",
+  intent: "",
+  education: "",
+  education_detail: "",
+  has_experience: "",
+  industry: "",
+  vacancy: "",
   notes: "",
+  email: "",
 };
 
 export default function SurveyForm() {
@@ -33,15 +63,39 @@ export default function SurveyForm() {
   const [data, setData] = useState(initial);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [vacancies, setVacancies] = useState([]);
+  const [uploadingKey, setUploadingKey] = useState(null);
+
+  useEffect(() => {
+    api.get("/vacancies").then((r) => setVacancies(r.data || [])).catch(() => {});
+  }, []);
 
   const set = (k, v) => setData((d) => ({ ...d, [k]: v }));
 
+  const uploadPassport = async (side, file) => {
+    if (!file) return;
+    setUploadingKey(side);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const { data: resp } = await api.post("/survey/upload", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      set(side === "front" ? "passport_front_path" : "passport_back_path", resp.path);
+      toast.success(`Passport ${side} uploaded`);
+    } catch (e) {
+      toast.error(formatApiError(e));
+    } finally {
+      setUploadingKey(null);
+    }
+  };
+
   const canNext = () => {
-    if (step === 0) return !!data.location;
-    if (step === 1) return !!data.intent;
-    if (step === 2) return !!data.education && !!data.budget;
-    if (step === 3) return !!data.field_or_type;
-    if (step === 4) return !!data.name && !!data.email && !!data.phone;
+    if (step === 0) return !!data.name && !!data.age && !!data.phone;
+    if (step === 1) return !!data.state;
+    if (step === 2) return !!data.has_passport;
+    if (step === 3) return !!data.intent;
+    if (step === 4) return !!data.education && !!data.has_experience;
     return false;
   };
 
@@ -70,13 +124,17 @@ export default function SurveyForm() {
               <ClipboardCheck className="w-3.5 h-3.5" /> Free Counselling
             </p>
             <h2 className="font-serif-display text-4xl sm:text-5xl leading-[1.05] tracking-tight">
-              Start your UAE <span className="italic text-[#C5A059]">business journey</span> today.
+              Start your UAE <span className="italic text-[#C5A059]">journey</span> today.
             </h2>
             <p className="mt-6 text-white/70 leading-relaxed max-w-md">
-              Instead of a generic contact form, we ask a few short questions so our consultants can prepare a tailored plan before we speak with you.
+              A few short questions help our consultants prepare a tailored plan — for a visa, a job in the UAE, or a company setup — before we speak with you.
             </p>
             <ul className="mt-8 space-y-3 text-sm text-white/80 max-w-md">
-              {["No obligation", "Response within 1 business day", "Handled by senior consultants"].map((f) => (
+              {[
+                "No obligation, no cost",
+                "Response within one business day",
+                "Handled by senior consultants",
+              ].map((f) => (
                 <li key={f} className="flex items-center gap-3">
                   <CheckCircle2 className="w-4 h-4 text-[#C5A059]" /> {f}
                 </li>
@@ -108,51 +166,103 @@ export default function SurveyForm() {
                   <Progress value={progress} className="h-1 mb-8 bg-accent [&>div]:bg-[#C5A059]" />
 
                   {step === 0 && (
-                    <div data-testid="step-location">
-                      <h3 className="font-serif-display text-3xl mb-2">Where are you right now?</h3>
-                      <p className="text-sm text-muted-foreground mb-6">Helps us understand your visa & travel context.</p>
-                      <RadioGroup value={data.location} onValueChange={(v) => set("location", v)} className="grid sm:grid-cols-2 gap-3">
-                        {[
-                          ["inside_uae", "I'm inside the UAE"],
-                          ["outside_uae", "I'm outside the UAE"],
-                        ].map(([val, label]) => (
-                          <label key={val} className={`border cursor-pointer p-4 flex items-center gap-3 transition-colors ${data.location === val ? "border-[#C5A059] bg-accent/60" : "hairline"}`}>
-                            <RadioGroupItem value={val} data-testid={`opt-loc-${val}`} />
+                    <div data-testid="step-basics">
+                      <h3 className="font-serif-display text-3xl mb-2">Tell us about yourself</h3>
+                      <p className="text-sm text-muted-foreground mb-6">Your name, age and a phone number we can reach you on.</p>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Full name</Label>
+                          <Input value={data.name} onChange={(e) => set("name", e.target.value)} required data-testid="opt-name" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>Age</Label>
+                            <Select value={data.age} onValueChange={(v) => set("age", v)}>
+                              <SelectTrigger data-testid="opt-age" className="mt-2"><SelectValue placeholder="Scroll to pick" /></SelectTrigger>
+                              <SelectContent className="max-h-72">
+                                {Array.from({ length: 55 }, (_, i) => i + 16).map((n) => (
+                                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label>Phone (with country code)</Label>
+                            <Input value={data.phone} onChange={(e) => set("phone", e.target.value)} required placeholder="+91 …" data-testid="opt-phone" />
+                          </div>
+                        </div>
+                        <div>
+                          <Label>Email <span className="text-muted-foreground">(optional)</span></Label>
+                          <Input type="email" value={data.email} onChange={(e) => set("email", e.target.value)} data-testid="opt-email" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {step === 1 && (
+                    <div data-testid="step-state">
+                      <h3 className="font-serif-display text-3xl mb-2">Which state are you from?</h3>
+                      <p className="text-sm text-muted-foreground mb-6">Helps us route you to the right regional consultant.</p>
+                      <Label>State</Label>
+                      <Select value={data.state} onValueChange={(v) => set("state", v)}>
+                        <SelectTrigger data-testid="opt-state" className="mt-2"><SelectValue placeholder="Scroll to select your state" /></SelectTrigger>
+                        <SelectContent className="max-h-80">
+                          {INDIAN_STATES.map((s) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
+                          <SelectItem value="Outside India">Outside India</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {step === 2 && (
+                    <div data-testid="step-passport">
+                      <h3 className="font-serif-display text-3xl mb-2">Do you have a valid passport?</h3>
+                      <p className="text-sm text-muted-foreground mb-6">If yes, please upload the front and back for our records.</p>
+                      <RadioGroup value={data.has_passport} onValueChange={(v) => set("has_passport", v)} className="grid sm:grid-cols-2 gap-3">
+                        {[["yes","Yes, I have a valid passport"], ["no","No, not yet"]].map(([val, label]) => (
+                          <label key={val} className={`border cursor-pointer p-4 flex items-center gap-3 transition-colors ${data.has_passport === val ? "border-[#C5A059] bg-accent/60" : "hairline"}`}>
+                            <RadioGroupItem value={val} data-testid={`opt-pp-${val}`} />
                             <span className="text-sm font-medium">{label}</span>
                           </label>
                         ))}
                       </RadioGroup>
-                      {data.location === "inside_uae" && (
-                        <div className="mt-6">
-                          <Label>Current visa status</Label>
-                          <Select value={data.visa_status} onValueChange={(v) => set("visa_status", v)}>
-                            <SelectTrigger data-testid="opt-visa-status" className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="visit">Visit visa</SelectItem>
-                              <SelectItem value="employment">Employment visa</SelectItem>
-                              <SelectItem value="investor">Investor visa</SelectItem>
-                              <SelectItem value="family">Family visa</SelectItem>
-                              <SelectItem value="cancelled">Recently cancelled</SelectItem>
-                              <SelectItem value="none">No visa yet</SelectItem>
-                            </SelectContent>
-                          </Select>
+
+                      {data.has_passport === "yes" && (
+                        <div className="mt-6 grid sm:grid-cols-2 gap-4">
+                          {[
+                            { side: "front", label: "Passport front", path: data.passport_front_path },
+                            { side: "back", label: "Passport back", path: data.passport_back_path },
+                          ].map((p) => (
+                            <div key={p.side}>
+                              <Label>{p.label}</Label>
+                              <label className="mt-2 flex items-center gap-3 border hairline px-3 py-3 cursor-pointer hover:border-[#C5A059] transition-colors" data-testid={`opt-pp-file-${p.side}`}>
+                                <Upload className="w-4 h-4 text-[#C5A059]" />
+                                <span className="text-xs flex-1 truncate">
+                                  {uploadingKey === p.side ? "Uploading…" : p.path ? "Uploaded ✓" : "Choose image or PDF"}
+                                </span>
+                                <input
+                                  type="file"
+                                  accept="image/*,application/pdf"
+                                  className="hidden"
+                                  onChange={(e) => uploadPassport(p.side, e.target.files?.[0])}
+                                />
+                              </label>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
                   )}
 
-                  {step === 1 && (
+                  {step === 3 && (
                     <div data-testid="step-intent">
-                      <h3 className="font-serif-display text-3xl mb-2">What brings you to the UAE?</h3>
-                      <p className="text-sm text-muted-foreground mb-6">Choose the option that best describes your goal.</p>
-                      <RadioGroup value={data.intent} onValueChange={(v) => set("intent", v)} className="grid sm:grid-cols-2 gap-3">
+                      <h3 className="font-serif-display text-3xl mb-2">What are you planning?</h3>
+                      <p className="text-sm text-muted-foreground mb-6">Pick the option that best describes your goal.</p>
+                      <RadioGroup value={data.intent} onValueChange={(v) => set("intent", v)} className="grid gap-3">
                         {[
-                          ["business", "I want to open a business / trade license"],
-                          ["job", "I'm looking for a job"],
-                          ["visit", "I'm coming on a visit basis"],
-                          ["taxi", "Sharjah taxi driver visa"],
-                          ["family", "Family visa / dependent"],
-                          ["other", "Other / not sure yet"],
+                          ["visit","Visit the UAE (tourism)"],
+                          ["business","Open a company in the UAE"],
+                          ["job","Looking for a job in the UAE"],
                         ].map(([val, label]) => (
                           <label key={val} className={`border cursor-pointer p-4 flex items-center gap-3 transition-colors ${data.intent === val ? "border-[#C5A059] bg-accent/60" : "hairline"}`}>
                             <RadioGroupItem value={val} data-testid={`opt-intent-${val}`} />
@@ -163,101 +273,80 @@ export default function SurveyForm() {
                     </div>
                   )}
 
-                  {step === 2 && (
-                    <div data-testid="step-education-budget">
+                  {step === 4 && (
+                    <div data-testid="step-work">
                       <h3 className="font-serif-display text-3xl mb-2">Your background</h3>
-                      <p className="text-sm text-muted-foreground mb-6">A few basics so we recommend the right path.</p>
+                      <p className="text-sm text-muted-foreground mb-6">A few details help us match you to the right opportunity.</p>
                       <div className="space-y-5">
-                        <div>
-                          <Label>Highest education</Label>
-                          <Select value={data.education} onValueChange={(v) => set("education", v)}>
-                            <SelectTrigger data-testid="opt-education" className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="school">School</SelectItem>
-                              <SelectItem value="diploma">Diploma / ITI</SelectItem>
-                              <SelectItem value="bachelor">Bachelor's</SelectItem>
-                              <SelectItem value="master">Master's or higher</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
-                            </SelectContent>
-                          </Select>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label>Last education</Label>
+                            <Select value={data.education} onValueChange={(v) => { set("education", v); set("education_detail", ""); }}>
+                              <SelectTrigger data-testid="opt-education" className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="10th">10th</SelectItem>
+                                <SelectItem value="12th">12th</SelectItem>
+                                <SelectItem value="Graduation">Graduation</SelectItem>
+                                <SelectItem value="Post-Graduation">Post-Graduation</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          {data.education && (
+                            <div>
+                              <Label>Field / stream</Label>
+                              <Select value={data.education_detail} onValueChange={(v) => set("education_detail", v)}>
+                                <SelectTrigger data-testid="opt-edu-detail" className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
+                                <SelectContent>
+                                  {(EDU_DETAIL[data.education] || []).map((d) => (
+                                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
                         </div>
                         <div>
-                          <Label>Approximate budget (AED)</Label>
-                          <Select value={data.budget} onValueChange={(v) => set("budget", v)}>
-                            <SelectTrigger data-testid="opt-budget" className="mt-2"><SelectValue placeholder="Select range" /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="lt-10k">Less than 10,000 AED</SelectItem>
-                              <SelectItem value="10-25k">10,000 – 25,000 AED</SelectItem>
-                              <SelectItem value="25-50k">25,000 – 50,000 AED</SelectItem>
-                              <SelectItem value="50-100k">50,000 – 100,000 AED</SelectItem>
-                              <SelectItem value="gt-100k">More than 100,000 AED</SelectItem>
-                              <SelectItem value="not-sure">Not sure yet</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Label>Do you have any working experience?</Label>
+                          <RadioGroup value={data.has_experience} onValueChange={(v) => set("has_experience", v)} className="mt-2 grid grid-cols-2 gap-3">
+                            {[["yes","Yes"],["no","No"]].map(([val,label]) => (
+                              <label key={val} className={`border cursor-pointer p-3 flex items-center gap-3 transition-colors ${data.has_experience === val ? "border-[#C5A059] bg-accent/60" : "hairline"}`}>
+                                <RadioGroupItem value={val} data-testid={`opt-exp-${val}`} />
+                                <span className="text-sm font-medium">{label}</span>
+                              </label>
+                            ))}
+                          </RadioGroup>
                         </div>
-                        <div>
-                          <Label>Years of work experience</Label>
-                          <Input value={data.experience_years} onChange={(e) => set("experience_years", e.target.value)} placeholder="e.g. 5" data-testid="opt-experience" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
-                  {step === 3 && (
-                    <div data-testid="step-type">
-                      <h3 className="font-serif-display text-3xl mb-2">Tell us more</h3>
-                      <p className="text-sm text-muted-foreground mb-6">
-                        {data.intent === "business" ? "What kind of business are you planning?" :
-                         data.intent === "job" ? "What type of job or industry are you looking for?" :
-                         "Describe what you're planning in the UAE."}
-                      </p>
-                      <div className="space-y-5">
-                        <div>
-                          <Label>Business type / job field</Label>
-                          <Input value={data.field_or_type} onChange={(e) => set("field_or_type", e.target.value)}
-                            placeholder="e.g. General trading, IT services, Retail sales…" data-testid="opt-field" />
-                        </div>
-                        <div>
-                          <Label>Timeline to start</Label>
-                          <Select value={data.timeline} onValueChange={(v) => set("timeline", v)}>
-                            <SelectTrigger data-testid="opt-timeline" className="mt-2"><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="asap">As soon as possible</SelectItem>
-                              <SelectItem value="1-month">Within 1 month</SelectItem>
-                              <SelectItem value="3-month">Within 3 months</SelectItem>
-                              <SelectItem value="6-month">Within 6 months</SelectItem>
-                              <SelectItem value="exploring">Just exploring</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                        {data.has_experience === "yes" && (
+                          <div>
+                            <Label>Which industry?</Label>
+                            <Select value={data.industry} onValueChange={(v) => set("industry", v)}>
+                              <SelectTrigger data-testid="opt-industry" className="mt-2"><SelectValue placeholder="Select industry" /></SelectTrigger>
+                              <SelectContent className="max-h-72">
+                                {INDUSTRIES.map((i) => (<SelectItem key={i} value={i}>{i}</SelectItem>))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                        {data.intent === "job" && (
+                          <div>
+                            <Label>Which vacancy interests you?</Label>
+                            <Select value={data.vacancy} onValueChange={(v) => set("vacancy", v)}>
+                              <SelectTrigger data-testid="opt-vacancy" className="mt-2"><SelectValue placeholder="Select open vacancy" /></SelectTrigger>
+                              <SelectContent className="max-h-72">
+                                {vacancies.map((v) => (
+                                  <SelectItem key={v.id} value={v.title}>{v.title}</SelectItem>
+                                ))}
+                                <SelectItem value="Other / not listed">Other / not listed</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
                         <div>
                           <Label>Anything else we should know? <span className="text-muted-foreground">(optional)</span></Label>
                           <Textarea rows={3} value={data.notes} onChange={(e) => set("notes", e.target.value)} data-testid="opt-notes" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {step === 4 && (
-                    <div data-testid="step-contact">
-                      <h3 className="font-serif-display text-3xl mb-2">Where should we reach you?</h3>
-                      <p className="text-sm text-muted-foreground mb-6">A senior consultant will call you within one business day.</p>
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <Label>Full name</Label>
-                          <Input value={data.name} onChange={(e) => set("name", e.target.value)} required data-testid="opt-name" />
-                        </div>
-                        <div>
-                          <Label>Nationality</Label>
-                          <Input value={data.nationality} onChange={(e) => set("nationality", e.target.value)} data-testid="opt-nationality" />
-                        </div>
-                        <div>
-                          <Label>Email</Label>
-                          <Input type="email" value={data.email} onChange={(e) => set("email", e.target.value)} required data-testid="opt-email" />
-                        </div>
-                        <div>
-                          <Label>Phone (with country code)</Label>
-                          <Input value={data.phone} onChange={(e) => set("phone", e.target.value)} required placeholder="+971 …" data-testid="opt-phone" />
                         </div>
                       </div>
                     </div>

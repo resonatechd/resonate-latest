@@ -1,55 +1,41 @@
 import {
-  FileText, Building2, Stamp, Users, Calculator, Megaphone, IdCard,
+  Briefcase, Users, Stamp, Calculator, Megaphone,
 } from "lucide-react";
 
 const services = [
   {
-    icon: Stamp,
-    title: "UAE Trade License",
-    desc: "Mainland, free zone or professional licenses — with expert guidance and hassle-free registration.",
-    span: "md:col-span-5",
-    tone: "light",
-  },
-  {
-    icon: Building2,
-    title: "Business Setup & Corporate Documentation",
-    desc: "Company registration, approvals, renewals, amendments and legal paperwork end-to-end.",
+    icon: Briefcase,
+    title: "Project Management & Documentation",
+    desc: "End-to-end coordination and paperwork — approvals, renewals, amendments and legal documentation handled by a single team.",
     span: "md:col-span-7",
     tone: "dark",
   },
   {
-    icon: IdCard,
-    title: "Visa Services",
-    desc: "Employment, Investor, Partner, Family, Emirates ID, Medical & Biometrics, Renewals.",
-    span: "md:col-span-4",
+    icon: Users,
+    title: "Manpower Solutions & Talent Acquisition",
+    desc: "Recruiting skilled professionals across industries and connecting candidates to UAE opportunities.",
+    span: "md:col-span-5",
+    tone: "light",
+  },
+  {
+    icon: Stamp,
+    title: "UAE Trade License — Suggestion & Provision",
+    desc: "We recommend and provision the right mainland, free zone or professional license for your activity.",
+    span: "md:col-span-5",
     tone: "gold",
   },
   {
-    icon: Users,
-    title: "Manpower & Talent Acquisition",
-    desc: "Recruiting skilled professionals across industries and connecting candidates to UAE opportunities.",
-    span: "md:col-span-4",
-    tone: "light",
-  },
-  {
     icon: Calculator,
-    title: "Corporate Tax & PRO Services",
-    desc: "Tax registration, VAT support, government typing services, PRO & compliance documentation.",
-    span: "md:col-span-4",
-    tone: "light",
-  },
-  {
-    icon: Megaphone,
-    title: "Digital Marketing",
-    desc: "Meta ads, lead generation, branding and online presence management for UAE businesses.",
+    title: "Corporate Tax & Typing Services",
+    desc: "Corporate tax registration, VAT support, PRO and government typing services — fully compliant, hassle-free.",
     span: "md:col-span-7",
     tone: "light",
   },
   {
-    icon: FileText,
-    title: "Documentation & Attestation",
-    desc: "MOFA, notarisation, translation and legal attestation for personal and corporate documents.",
-    span: "md:col-span-5",
+    icon: Megaphone,
+    title: "Digital Marketing & Meta Tools",
+    desc: "Meta ads, lead generation, branding and online presence management for UAE businesses.",
+    span: "md:col-span-12",
     tone: "dark",
   },
 ];
@@ -81,11 +67,11 @@ export default function Services() {
           <div>
             <p className="text-[11px] uppercase tracking-[0.3em] text-[#C5A059] mb-4">Our Services</p>
             <h2 className="font-serif-display text-4xl sm:text-5xl leading-[1.05] max-w-2xl tracking-tight">
-              Complete business support for the UAE, under <span className="italic text-[#C5A059]">one roof.</span>
+              Five core services, delivered <span className="italic text-[#C5A059]">under one roof.</span>
             </h2>
           </div>
           <p className="max-w-sm text-sm text-muted-foreground">
-            Seven core service lines built around the reality of doing business in the Emirates — from your first idea to your first invoice, and beyond.
+            Nothing extra — only what we do best, tailored for the reality of doing business and working in the UAE.
           </p>
         </div>
 

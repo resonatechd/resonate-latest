@@ -176,19 +176,41 @@ class LoginIn(BaseModel):
 
 
 class SurveyIn(BaseModel):
-    location: str  # inside_uae | outside_uae
-    intent: str  # business | job | visit | other
-    visa_status: Optional[str] = None
+    # Slide 1 - Personal
+    name: str
+    age: Optional[str] = None
+    phone: str
+    # Slide 2 - Location
+    state: Optional[str] = None
+    # Slide 3 - Passport
+    has_passport: Optional[str] = None  # yes | no
+    passport_front_path: Optional[str] = None
+    passport_back_path: Optional[str] = None
+    # Slide 4 - Intent
+    intent: str  # visit | business | job | other
+    # Slide 5 - Job / education
     education: Optional[str] = None
-    field_or_type: Optional[str] = None
+    education_detail: Optional[str] = None
+    has_experience: Optional[str] = None  # yes | no
+    industry: Optional[str] = None
+    vacancy: Optional[str] = None
+    # Extras / legacy contact
+    email: Optional[EmailStr] = None
+    nationality: Optional[str] = None
     budget: Optional[str] = None
     timeline: Optional[str] = None
-    experience_years: Optional[str] = None
-    name: str
-    email: EmailStr
-    phone: str
-    nationality: Optional[str] = None
     notes: Optional[str] = None
+    # Legacy
+    location: Optional[str] = None
+    visa_status: Optional[str] = None
+    field_or_type: Optional[str] = None
+    experience_years: Optional[str] = None
+
+
+class VacancyIn(BaseModel):
+    title: str
+    description: Optional[str] = ""
+    is_active: bool = True
 
 
 class UpdateOut(BaseModel):
@@ -208,6 +230,34 @@ async def on_startup():
     await db.users.create_index("email", unique=True)
     await db.surveys.create_index("created_at")
     await db.updates.create_index("created_at")
+    await db.vacancies.create_index("created_at")
+
+    # Seed default vacancies if none exist
+    if await db.vacancies.count_documents({}) == 0:
+        defaults = [
+            "Taxi Driver — Sharjah",
+            "Kitchen Helper / Cook — Restaurants (Ajman)",
+            "Waiter / Waitress — Hospitality",
+            "Housekeeping — Hotels",
+            "Delivery Rider — E-commerce",
+            "Truck Driver — Logistics",
+            "Accountant — Corporate Services",
+            "Admin Assistant — Corporate Office",
+            "Sales Executive — Retail / Real Estate",
+            "Digital Marketing Executive",
+        ]
+        now = datetime.now(timezone.utc).isoformat()
+        await db.vacancies.insert_many([
+            {
+                "id": str(uuid.uuid4()),
+                "title": t,
+                "description": "",
+                "is_active": True,
+                "is_deleted": False,
+                "created_at": now,
+            }
+            for t in defaults
+        ])
 
     # Seed admin
     existing = await db.users.find_one({"email": ADMIN_EMAIL})
@@ -296,57 +346,105 @@ async def list_updates_public():
 
 @api.get("/reviews")
 async def get_reviews():
-    # Static curated testimonials (Google-style)
+    # Curated Google-style reviews (admin can edit via /api/reviews-admin later)
     return [
         {
             "id": "r1",
-            "name": "Ahmed Al Mansoori",
+            "name": "Virat",
             "rating": 5,
-            "date": "2 weeks ago",
-            "text": "Resonate.Dubai handled my mainland trade license end-to-end. Transparent pricing and delivered before the promised date.",
+            "date": "7 months ago",
+            "text": "My experience here was seamless. The staff were professional and attentive. They answered all my questions thoroughly. I highly recommend this office for anyone looking for efficient and reliable service.",
             "avatar_color": "#C5A059",
         },
         {
             "id": "r2",
-            "name": "Priya Sharma",
+            "name": "Kamal Kumar",
             "rating": 5,
-            "date": "1 month ago",
-            "text": "Best consultancy for taxi driver visas in Sharjah. Mr. Khanna's team is genuinely helpful and reliable.",
+            "date": "7 months ago",
+            "text": "A highly professional immigration service. They made my visa process smooth and completely stress-free. I received regular updates throughout. Highly recommended!",
             "avatar_color": "#2C303A",
         },
         {
             "id": "r3",
-            "name": "Mohammed Iqbal",
+            "name": "Soumayya Sobti",
             "rating": 5,
-            "date": "3 weeks ago",
-            "text": "They processed my investor visa smoothly. Excellent communication throughout the process.",
+            "date": "7 months ago",
+            "text": "I had a very positive experience with this manpower recruitment company. The process was transparent, well-organised, and stress-free. Their expertise and attention to detail are commendable.",
             "avatar_color": "#8B7355",
         },
         {
             "id": "r4",
-            "name": "Fatima Hassan",
+            "name": "Aman Kumar",
             "rating": 5,
-            "date": "2 months ago",
-            "text": "Got PRO services and corporate tax registration done without any hassle. Highly recommend for SMEs.",
+            "date": "7 months ago",
+            "text": "Very transparent and genuine consultancy. No hidden charges and no false promises. The staff is supportive and well-trained.",
             "avatar_color": "#C5A059",
         },
         {
             "id": "r5",
-            "name": "Rajesh Patel",
+            "name": "Shetij Malhotra",
             "rating": 5,
-            "date": "5 weeks ago",
-            "text": "Freezone company setup completed within 10 days. Great support even after license issuance.",
+            "date": "5 months ago",
+            "text": "They helped us set up our UAE trade license in just 5 days — the entire process was smooth and Mr. Khanna's team stayed connected the whole way through. Truly grateful.",
             "avatar_color": "#2C303A",
         },
         {
             "id": "r6",
-            "name": "Sara Khan",
+            "name": "Balwinder Singh",
             "rating": 5,
-            "date": "1 week ago",
-            "text": "Family visa processing was seamless. Team kept me updated at every step. Thank you Resonate.Dubai!",
+            "date": "1 year ago",
+            "text": "It's been a year since I came to Sharjah as a taxi driver through Resonate. The salary is exactly what they promised, and I'm sending money home every month for my two kids. Very happy with the team.",
             "avatar_color": "#8B7355",
         },
+        {
+            "id": "r7",
+            "name": "Neha & Rajesh Sharma",
+            "rating": 5,
+            "date": "4 months ago",
+            "text": "We came on a couple's visa and the entire experience was hassle-free. The documentation was handled by them end-to-end and the medical was booked in advance. Would recommend to anyone.",
+            "avatar_color": "#C5A059",
+        },
+        {
+            "id": "r8",
+            "name": "Priya Sharma",
+            "rating": 5,
+            "date": "3 months ago",
+            "text": "Got PRO services and corporate tax registration done without any hassle. Highly recommend for SMEs — they explain every step clearly.",
+            "avatar_color": "#2C303A",
+        },
     ]
+
+
+@api.get("/vacancies")
+async def list_vacancies_public():
+    docs = (
+        await db.vacancies.find(
+            {"is_deleted": {"$ne": True}, "is_active": True}, {"_id": 0}
+        )
+        .sort("created_at", -1)
+        .to_list(200)
+    )
+    return docs
+
+
+@api.post("/survey/upload")
+async def survey_upload(file: UploadFile = File(...)):
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="Empty file")
+    ext = (file.filename.split(".")[-1] if file.filename and "." in file.filename else "bin").lower()
+    ct = file.content_type or "application/octet-stream"
+    path = f"{APP_NAME}/survey/{uuid.uuid4()}.{ext}"
+    result = put_object(path, content, ct)
+    # Track for admin visibility (no auth)
+    await db.survey_uploads.insert_one({
+        "id": str(uuid.uuid4()),
+        "path": result["path"],
+        "content_type": ct,
+        "size": result.get("size", 0),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"path": result["path"], "content_type": ct}
 
 
 @api.get("/files/{path:path}")
@@ -409,6 +507,37 @@ async def create_update(
 async def delete_update(update_id: str, admin=Depends(require_admin)):
     res = await db.updates.update_one(
         {"id": update_id}, {"$set": {"is_deleted": True}}
+    )
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Not found")
+    return {"ok": True}
+
+
+@api.get("/vacancies/all")
+async def list_vacancies_admin(admin=Depends(require_admin)):
+    docs = (
+        await db.vacancies.find({"is_deleted": {"$ne": True}}, {"_id": 0})
+        .sort("created_at", -1)
+        .to_list(500)
+    )
+    return docs
+
+
+@api.post("/vacancies")
+async def create_vacancy(body: VacancyIn, admin=Depends(require_admin)):
+    doc = body.model_dump()
+    doc["id"] = str(uuid.uuid4())
+    doc["is_deleted"] = False
+    doc["created_at"] = datetime.now(timezone.utc).isoformat()
+    await db.vacancies.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+
+@api.delete("/vacancies/{vacancy_id}")
+async def delete_vacancy(vacancy_id: str, admin=Depends(require_admin)):
+    res = await db.vacancies.update_one(
+        {"id": vacancy_id}, {"$set": {"is_deleted": True}}
     )
     if res.matched_count == 0:
         raise HTTPException(status_code=404, detail="Not found")

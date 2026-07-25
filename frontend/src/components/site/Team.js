@@ -1,27 +1,33 @@
 const TEAM = [
   {
-    name: "Mr. Khanna",
-    role: "Founder & Managing Consultant",
-    bio: "7 years of UAE business consulting experience. Leads strategy and client relations.",
-    img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=srgb&fm=jpg&w=800&q=80",
+    name: "Mr. R. Khanna",
+    role: "Founder & CEO",
+    img: "/team/khanna.jpg",
+    bio: "6+ years across recruitment, career counselling and talent acquisition — including two years in Canada where he trained as a certified IELTS trainer and served as a communications trainer at Dell (Toronto). Known for eloquent speaking and building interview confidence in young aspirants.",
   },
   {
-    name: "Layla Al Suwaidi",
-    role: "Head of Visa Operations",
-    bio: "Oversees all visa & Emirates ID processing, medicals and biometrics coordination.",
-    img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?crop=entropy&cs=srgb&fm=jpg&w=800&q=80",
+    name: "Ms. S. Sobti",
+    role: "Managing Director",
+    img: "/team/sobti.jpg",
+    bio: "Associated with Resonate.Dubai and Mr. Khanna's previous venture HUMBÈR since 2020. Bachelor of Science background with close experience alongside NHS UK and Malaysian health departments during Covid. Handles administration, CRM and channel partner relationships across India and Malaysia.",
   },
   {
-    name: "Rohan Mehta",
-    role: "Corporate Tax & PRO Lead",
-    bio: "Manages tax registration, VAT and government typing / PRO services end-to-end.",
-    img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?crop=entropy&cs=srgb&fm=jpg&w=800&q=80",
+    name: "Yasmeen Abbasi",
+    role: "Head of Operations",
+    img: "/team/yasmeen.jpg",
+    bio: "The backbone of Resonate. Hailing from Lahore with 25+ years of UAE experience. A high-spirited MBA graduate committed to client management, customer satisfaction and operational excellence — she brings strategic insight that drives consistent results.",
   },
   {
-    name: "Sana Iqbal",
-    role: "Digital Marketing Director",
-    bio: "Runs Meta ads, lead generation and branding for UAE-based clients.",
-    img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?crop=entropy&cs=srgb&fm=jpg&w=800&q=80",
+    name: "Mr. Abdul Rehman",
+    role: "Transport Supervisor",
+    img: "/team/rehman.jpg",
+    bio: "An engineer by profession and a musical enthusiast. Hails from Pakistan with 5+ years of UAE experience. Understands the anxiety a candidate feels when not counselled well — the primary bridge between us and our UAE-based client organisations.",
+  },
+  {
+    name: "Mr. Ramesh Bhati",
+    role: "Indian Client Supervisor",
+    img: "/team/bhati.jpg",
+    bio: "20+ years of experience in client management, advertising and lead generation. Brings fresh marketing strategies and sales techniques to the team. You'll usually find him in Chandigarh, India — building new customer relationships in the field.",
   },
 ];
 
@@ -37,18 +43,33 @@ export default function Team() {
             </h2>
           </div>
           <p className="max-w-sm text-sm text-muted-foreground">
-            A small, specialised team — each responsible for a discipline critical to your business in the Emirates.
+            A small, specialised team — each responsible for a discipline critical to your business, visa or career in the Emirates.
           </p>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
           {TEAM.map((t) => (
-            <article key={t.name} className="group" data-testid={`team-${t.name.toLowerCase().replace(/[^a-z]+/g, "-")}`}>
-              <div className="aspect-[4/5] overflow-hidden bg-accent">
-                <img src={t.img} alt={t.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[filter] duration-500" />
+            <article
+              key={t.name}
+              className="group border hairline bg-white overflow-hidden flex flex-col"
+              data-testid={`team-${t.name.toLowerCase().replace(/[^a-z]+/g, "-")}`}
+            >
+              <div className="aspect-[4/5] overflow-hidden bg-[#E8E2D2] relative">
+                <img
+                  src={t.img}
+                  alt={t.name}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement.dataset.fallback = t.name.charAt(0); }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center font-serif-display text-6xl italic text-[#C5A059]/60 pointer-events-none opacity-0 [[data-fallback]_&]:opacity-100">
+                  {t.name.split(" ").map((n) => n.charAt(0)).slice(0, 2).join("")}
+                </div>
               </div>
-              <h3 className="mt-4 font-serif-display text-xl">{t.name}</h3>
-              <p className="text-[11px] uppercase tracking-widest text-[#C5A059] mt-1">{t.role}</p>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{t.bio}</p>
+              <div className="p-5 flex-1 flex flex-col">
+                <h3 className="font-serif-display text-xl leading-tight">{t.name}</h3>
+                <p className="text-[10px] uppercase tracking-widest text-[#C5A059] mt-1">{t.role}</p>
+                <p className="mt-3 text-[13px] text-muted-foreground leading-relaxed">{t.bio}</p>
+              </div>
             </article>
           ))}
         </div>

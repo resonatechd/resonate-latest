@@ -9,6 +9,7 @@ import Industries from "../components/site/Industries";
 import Process from "../components/site/Process";
 import DynamicUpdates from "../components/site/DynamicUpdates";
 import Team from "../components/site/Team";
+import ClientsPartners from "../components/site/ClientsPartners";
 import Reviews from "../components/site/Reviews";
 import FAQSection from "../components/site/FAQSection";
 import SurveyForm from "../components/site/SurveyForm";
@@ -37,6 +38,7 @@ export default function Home() {
         <Industries />
         <DynamicUpdates updates={updates} />
         <Team />
+        <ClientsPartners />
         <Reviews reviews={reviews} />
         <FAQSection />
         <SurveyForm />
