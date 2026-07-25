@@ -1,9 +1,11 @@
 import { Button } from "../ui/button";
 import { CheckCircle2, ArrowRight } from "lucide-react";
+import { useSurveyDialog } from "../../context/SurveyDialogContext";
 
 const SKYLINE = "https://images.unsplash.com/photo-1651467606797-e1c660cf3fda?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxkdWJhaSUyMHNreWxpbmUlMjBsdXh1cnl8ZW58MHx8fHwxNzg0MjE4OTUwfDA&ixlib=rb-4.1.0&q=85";
 
 export default function Hero() {
+  const { openSurvey } = useSurveyDialog();
   return (
     <section id="top" className="pt-24 pb-16 bg-background relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-10 items-center">
@@ -35,11 +37,11 @@ export default function Hero() {
           </ul>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Button asChild className="bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none h-12 px-7 text-sm" data-testid="hero-cta-consultation">
-              <a href="#counselling">Get Free Consultation <ArrowRight className="w-4 h-4 ml-2" /></a>
+            <Button onClick={openSurvey} className="bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none h-12 px-7 text-sm" data-testid="hero-cta-consultation">
+              Get Free Consultation <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button asChild variant="outline" className="rounded-none border-[#2C303A] text-[#2C303A] hover:bg-[#2C303A] hover:text-white h-12 px-7 text-sm" data-testid="hero-cta-expert">
-              <a href="#counselling">Talk to an Expert</a>
+            <Button onClick={openSurvey} variant="outline" className="rounded-none border-[#2C303A] text-[#2C303A] hover:bg-[#2C303A] hover:text-white h-12 px-7 text-sm" data-testid="hero-cta-expert">
+              Talk to an Expert
             </Button>
           </div>
 

@@ -1,9 +1,11 @@
 import { Button } from "../ui/button";
 import { CheckCircle2, ArrowRight } from "lucide-react";
+import { useSurveyDialog } from "../../context/SurveyDialogContext";
 
 const TAXI = "https://images.unsplash.com/photo-1630717285906-29364ffacea0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwyfHx5ZWxsb3clMjB0YXhpJTIwY2FyfGVufDB8fHx8MTc4NDIxODk1MHww&ixlib=rb-4.1.0&q=85";
 
 export default function TaxiVisa() {
+  const { openSurvey } = useSurveyDialog();
   const features = [
     "End-to-End Visa Support",
     "Complete Documentation",
@@ -38,8 +40,8 @@ export default function TaxiVisa() {
             ))}
           </ul>
 
-          <Button asChild className="mt-10 bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none h-12 px-7" data-testid="taxi-cta">
-            <a href="#counselling">Enquire for Taxi Visa <ArrowRight className="w-4 h-4 ml-2" /></a>
+          <Button onClick={openSurvey} className="mt-10 bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none h-12 px-7" data-testid="taxi-cta">
+            Enquire for Taxi Visa <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </div>

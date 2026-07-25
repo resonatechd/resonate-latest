@@ -13,6 +13,8 @@ import ClientsPartners from "../components/site/ClientsPartners";
 import Reviews from "../components/site/Reviews";
 import FAQSection from "../components/site/FAQSection";
 import SurveyForm from "../components/site/SurveyForm";
+import CTABanner from "../components/site/CTABanner";
+import SurveyDialog from "../components/site/SurveyDialog";
 import Footer from "../components/site/Footer";
 import api from "../lib/api";
 
@@ -41,9 +43,10 @@ export default function Home() {
         <ClientsPartners />
         <Reviews reviews={reviews} />
         <FAQSection />
-        <SurveyForm />
+        <CTABanner />
       </main>
       <Footer />
+      <SurveyDialog />
     </div>
   );
 }

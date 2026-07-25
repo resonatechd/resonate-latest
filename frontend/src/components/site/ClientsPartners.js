@@ -3,41 +3,50 @@ const CLIENTS = [
     name: "The Crown Restaurant Ajman",
     logo: "/clients/TheCrownRestaurantAjman.png",
     quote: "Resonate delivers reliable manpower and satisfactory services.",
+    // dark green logo — full bleed looks best
+    fit: "cover",
   },
   {
     name: "Victory Line Financial Services LLC Dubai",
     logo: "/clients/VictoryLineFinancialServicesLLCDubai.png",
     quote: "Professional documentation & consistent client support.",
+    fit: "contain",
   },
   {
     name: "Sharjah Taxi, Sharjah",
     logo: "/clients/SharjahTaxiSharjah.png",
     quote: "Trusted partner for taxi driver visa processing at scale.",
+    fit: "contain",
   },
   {
     name: "Star Marine Logistics Ajman",
     logo: "/clients/StarMarineLogisticsAjman.png",
     quote: "Skilled hands, delivered on time, every time.",
+    fit: "contain",
   },
   {
     name: "West Zone Group Ajman",
     logo: "/clients/WestZoneGroupAjman.png",
     quote: "Dependable manpower solutions across retail operations.",
+    fit: "contain",
   },
   {
     name: "Zafran Tea Restaurant Ajman",
-    logo: "/clients/ZafranTeaRestaurantAjmanOwner.jpg",
+    logo: "/clients/ZafranTeaRestaurantAjman.png",
     quote: "Excellent service and long-standing partnership.",
+    fit: "contain",
   },
   {
     name: "Al Khairat Cleaning Services",
     logo: "/clients/AlKhairatCleaningServices.png",
     quote: "Genuine consultancy — no false promises.",
+    fit: "contain",
   },
   {
     name: "Al Arabia Taxi, RAK",
     logo: "/clients/AlArabiaTaxiRAK.png",
     quote: "End-to-end driver onboarding, done right.",
+    fit: "contain",
   },
 ];
 
@@ -53,23 +62,29 @@ const PARTNERS = [
 
 function ClientCard({ c }) {
   const initials = c.name.split(" ").filter(Boolean).slice(0, 2).map((w) => w.charAt(0)).join("");
+  const isCover = c.fit === "cover";
   return (
     <article
       className="flex flex-col items-center text-center group"
       data-testid={`client-${c.name.toLowerCase().replace(/[^a-z]+/g, "-")}`}
     >
-      <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-accent bg-white shadow-sm group-hover:border-[#C5A059] transition-colors duration-300 relative">
+      <div className="relative w-28 h-28 rounded-full overflow-hidden bg-white shadow-md ring-1 ring-black/5 group-hover:ring-[#C5A059] group-hover:shadow-lg transition-all duration-300 flex items-center justify-center">
+        <span className="absolute font-serif-display text-2xl italic text-[#C5A059]/40 select-none">
+          {initials}
+        </span>
         <img
           src={c.logo}
           alt={c.name}
-          className="w-full h-full object-cover"
-          onError={(e) => { e.currentTarget.style.display = "none"; }}
+          className={
+            "relative z-10 w-full h-full " +
+            (isCover
+              ? "object-cover"
+              : "object-contain p-3")
+          }
+          onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
         />
-        <div className="absolute inset-0 flex items-center justify-center font-serif-display text-3xl italic text-[#C5A059]/60 pointer-events-none -z-0">
-          {initials}
-        </div>
       </div>
-      <h4 className="mt-4 font-serif-display text-lg leading-tight">{c.name}</h4>
+      <h4 className="mt-4 font-serif-display text-lg leading-tight max-w-[220px]">{c.name}</h4>
       <p className="mt-1 text-xs text-muted-foreground/80 italic max-w-[220px]">{c.quote}</p>
     </article>
   );

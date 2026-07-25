@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Menu, X } from "lucide-react";
+import { useSurveyDialog } from "../../context/SurveyDialogContext";
 
 const links = [
   { href: "#about", label: "About" },
@@ -16,6 +17,7 @@ const links = [
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { openSurvey } = useSurveyDialog();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -51,12 +53,10 @@ export default function Nav() {
 
         <div className="hidden md:block">
           <Button
-            asChild
+            onClick={openSurvey}
             className="bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none h-10 px-5"
             data-testid="nav-cta-consultation"
-          >
-            <a href="#counselling">Free Consultation →</a>
-          </Button>
+          >Free Consultation →</Button>
         </div>
 
         <button
@@ -82,8 +82,8 @@ export default function Nav() {
               {l.label}
             </a>
           ))}
-          <Button asChild className="w-full bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none">
-            <a href="#counselling" onClick={() => setOpen(false)}>Free Consultation</a>
+          <Button onClick={() => { setOpen(false); openSurvey(); }} className="w-full bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none">
+            Free Consultation
           </Button>
         </div>
       )}
