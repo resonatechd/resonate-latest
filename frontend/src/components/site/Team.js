@@ -29,10 +29,10 @@ const TEAM = [
     bio: "6+ years across recruitment, career counselling and talent acquisition — including two years in Canada where he trained as a certified IELTS trainer and served as a communications trainer at Dell (Toronto). Known for eloquent speaking and building interview confidence in young aspirants.",
   },
   {
-    name: "Ms. S. Sobti",
+    name: "Mrs. S R Sobti",
     role: "Managing Director",
     img: "/team/sobti.jpg",
-    bio: "Associated with Resonate.Dubai and Mr. Khanna's previous venture HUMBÈR since 2020. Bachelor of Science background with close experience alongside NHS UK and Malaysian health departments during Covid. Handles administration, CRM and channel partner relationships across India and Malaysia.",
+    bio: "Associated with Resonate Dubai LLC and Mr. Khanna's previous venture HUMBÈR since 2020. Bachelor of Science background with close experience alongside NHS UK and Malaysian health departments during Covid. Handles administration, CRM and channel partner relationships across India and Malaysia.",
   },
   {
     name: "Yasmeen Abbasi",

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Nav from "../components/site/Nav";
 import Hero from "../components/site/Hero";
 import About from "../components/site/About";
+import CompassOffice from "../components/site/CompassOffice";
 import Services from "../components/site/Services";
 import TaxiVisa from "../components/site/TaxiVisa";
 import WhyChooseUs from "../components/site/WhyChooseUs";
@@ -33,6 +34,7 @@ export default function Home() {
       <main>
         <Hero />
         <About />
+        <CompassOffice />
         <Services />
         <TaxiVisa />
         <WhyChooseUs />

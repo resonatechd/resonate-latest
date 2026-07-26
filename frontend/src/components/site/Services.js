@@ -1,48 +1,39 @@
-import {
-  Briefcase, Users, Stamp, Calculator, Megaphone,
-} from "lucide-react";
+import { Briefcase, Scale, Calculator, Newspaper } from "lucide-react";
 
 const services = [
   {
-    icon: Briefcase,
-    title: "Project Management & Documentation",
-    desc: "End-to-end coordination and paperwork — approvals, renewals, amendments and legal documentation handled by a single team.",
+    icon: Scale,
+    title: "UAE Trade License Services",
+    desc: "Choose the right mainland, free zone or professional license — with expert guidance, hassle-free registration and provisioning end-to-end.",
     span: "md:col-span-7",
     tone: "dark",
   },
   {
-    icon: Users,
-    title: "Manpower Solutions & Talent Acquisition",
-    desc: "Recruiting skilled professionals across industries and connecting candidates to UAE opportunities.",
+    icon: Briefcase,
+    title: "Project Management & Legal Documentation",
+    desc: "End-to-end coordination and paperwork — approvals, renewals, amendments and legal documentation, all managed by one dedicated team.",
     span: "md:col-span-5",
     tone: "light",
   },
   {
-    icon: Stamp,
-    title: "UAE Trade License — Suggestion & Provision",
-    desc: "We recommend and provision the right mainland, free zone or professional license for your activity.",
+    icon: Calculator,
+    title: "Corporate Tax & Talent Acquisition",
+    desc: "Corporate tax registration, VAT and compliance combined with expert manpower recruitment and Indian talent acquisition for UAE businesses.",
     span: "md:col-span-5",
     tone: "gold",
   },
   {
-    icon: Calculator,
-    title: "Corporate Tax & Typing Services",
-    desc: "Corporate tax registration, VAT support, PRO and government typing services — fully compliant, hassle-free.",
+    icon: Newspaper,
+    title: "Taxi Visa & Golden Visa Updates",
+    desc: "Latest updates and advisory on Sharjah taxi driver placements and the UAE Golden Visa programme — curated for our clients and partners.",
     span: "md:col-span-7",
     tone: "light",
-  },
-  {
-    icon: Megaphone,
-    title: "Digital Marketing & Meta Tools",
-    desc: "Meta ads, lead generation, branding and online presence management for UAE businesses.",
-    span: "md:col-span-12",
-    tone: "dark",
   },
 ];
 
 function Card({ s }) {
   const Icon = s.icon;
-  const base = "group relative p-8 min-h-[220px] flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1";
+  const base = "group relative p-8 min-h-[240px] flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1";
   const tones = {
     light: "bg-white border hairline",
     dark: "bg-[#2C303A] text-white",
@@ -67,11 +58,11 @@ export default function Services() {
           <div>
             <p className="text-[11px] uppercase tracking-[0.3em] text-[#C5A059] mb-4">Our Services</p>
             <h2 className="font-serif-display text-4xl sm:text-5xl leading-[1.05] max-w-2xl tracking-tight">
-              Five core services, delivered <span className="italic text-[#C5A059]">under one roof.</span>
+              Four core services, delivered <span className="italic text-[#C5A059]">under one roof.</span>
             </h2>
           </div>
           <p className="max-w-sm text-sm text-muted-foreground">
-            Nothing extra — only what we do best, tailored for the reality of doing business and working in the UAE.
+            Nothing extra — only what we do best, tailored for the reality of doing business, hiring and growing in the UAE.
           </p>
         </div>
 

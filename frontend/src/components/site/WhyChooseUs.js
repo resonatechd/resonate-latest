@@ -2,7 +2,7 @@ import { Award, Clock, Handshake, ShieldCheck, Sparkles, UserRoundCheck } from "
 
 const items = [
   { icon: Award, title: "UAE Registered Company", desc: "Fully licensed business with a valid trade license until March 2027." },
-  { icon: UserRoundCheck, title: "Experienced Consultants", desc: "7 years of hands-on experience across mainland, free zone and PRO services." },
+  { icon: UserRoundCheck, title: "Experienced Consultants", desc: "6+ years of hands-on experience across mainland, free zone, PRO and manpower recruitment services." },
   { icon: Clock, title: "Fast Processing", desc: "Streamlined submission pipelines to shorten government approval timelines." },
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "No hidden costs. Clear breakdowns before you commit to any service." },
   { icon: Handshake, title: "Personalised Consultation", desc: "Every client receives a tailored plan based on their business or visa objective." },

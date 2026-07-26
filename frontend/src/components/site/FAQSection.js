@@ -3,10 +3,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 const faqs = [
   { q: "How can I start a business in the UAE?", a: "Our consultants help you choose the right business structure, obtain approvals, and complete the registration process — mainland, free zone, or offshore." },
   { q: "Which trade license is right for me?", a: "We recommend the most suitable mainland or free zone license based on your business activity, ownership preferences, and long-term goals." },
-  { q: "Can you help with investor and employment visas?", a: "Yes. We provide complete visa assistance from application to approval — including medicals, biometrics, and Emirates ID." },
-  { q: "Do you provide corporate tax services?", a: "Yes — corporate tax registration, VAT support, filings, and compliance documentation are handled end-to-end." },
-  { q: "Do you offer manpower solutions?", a: "Yes. We help businesses recruit qualified professionals across multiple sectors and connect candidates with UAE opportunities." },
-  { q: "Where is your head office?", a: "Compass Co-Working, Al Hamra, Ras Al Khaimah, UAE. We serve clients across the UAE and the wider Pan-Asia region." },
+  { q: "Can you help with talent acquisition and manpower recruitment?", a: "Yes. We provide end-to-end Indian talent acquisition and manpower recruitment for UAE businesses across taxi, hospitality, retail, corporate and skilled trades." },
+  { q: "Do you provide corporate tax services?", a: "Yes — corporate tax registration, VAT support, filings and compliance documentation are handled end-to-end." },
+  { q: "What are type-in services?", a: "Government-approved documentation and typing services for applications, renewals, amendments and legal paperwork — completed accurately and quickly." },
+  { q: "Where is your head office?", a: "Compass Co-Working, Al Jazeera Al Hamra Industry, Ras Al Khaimah, UAE. We serve clients across the UAE and the wider GCC region." },
 ];
 
 export default function FAQSection() {

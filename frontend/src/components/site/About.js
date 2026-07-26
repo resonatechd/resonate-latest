@@ -10,19 +10,19 @@ export default function About() {
         </div>
         <div className="lg:col-span-7 space-y-6 text-[15px] leading-relaxed text-[#2C303A]">
           <p>
-            Resonate.Dubai LLC is a UAE-registered business consultancy founded by Mr. Khanna, dedicated to helping entrepreneurs, professionals, and companies establish and grow their presence across the Emirates. With 7 years of industry experience and a valid trade license until March 2027, we operate across Pan Asia with deep roots in the UAE.
+            Resonate Dubai LLC is a UAE-registered project management and manpower recruitment consultancy founded by <strong>MR. KHANNA</strong>, dedicated to helping entrepreneurs, professionals and companies establish and grow their presence across the Emirates. With 6+ years of industry experience and a valid trade license until March 2027, we operate across the GCC with deep roots in the UAE.
           </p>
           <p>
-            From choosing the right business license to obtaining visas, corporate documentation, tax compliance, and digital growth — we provide complete business support under one roof. Our mission is to simplify complex government procedures and deliver reliable, transparent, and efficient business support.
+            From choosing the right business license to project management, legal documentation, corporate tax compliance, talent acquisition and manpower recruitment — we provide complete business support under one roof. Our mission is to simplify complex government procedures and deliver reliable, transparent and efficient business support.
           </p>
           <dl className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-6">
             {[
               ["UAE Registered", "Firm & LLC"],
               ["Trade License", "Valid · Mar 2027"],
-              ["Region", "Pan Asia"],
-              ["Experience", "7 Years"],
+              ["Region", "GCC"],
+              ["Experience", "6+ Years"],
               ["Head Office", "RAK, UAE"],
-              ["Founder", "Mr. Khanna"],
+              ["Founder", "MR. KHANNA"],
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{k}</dt>

@@ -204,7 +204,7 @@ export default function SurveyDialog() {
                           <Select value={data.age} onValueChange={(v) => set("age", v)}>
                             <SelectTrigger data-testid="opt-age" className="mt-2"><SelectValue placeholder="Scroll to pick" /></SelectTrigger>
                             <SelectContent className="max-h-72">
-                              {Array.from({ length: 55 }, (_, i) => i + 16).map((n) => (
+                              {Array.from({ length: 32 }, (_, i) => i + 18).map((n) => (
                                 <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                               ))}
                             </SelectContent>

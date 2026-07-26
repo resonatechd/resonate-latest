@@ -36,11 +36,11 @@ export default function CTABanner() {
               >Talk to an Expert</Button>
               <div className="pt-4 grid grid-cols-3 gap-3 text-center">
                 <div>
-                  <p className="font-serif-display text-2xl text-[#C5A059]">1000+</p>
+                  <p className="font-serif-display text-2xl text-[#C5A059]">300+</p>
                   <p className="text-[10px] uppercase tracking-widest text-white/50">Drivers</p>
                 </div>
                 <div>
-                  <p className="font-serif-display text-2xl text-[#C5A059]">7yrs</p>
+                  <p className="font-serif-display text-2xl text-[#C5A059]">6+ yrs</p>
                   <p className="text-[10px] uppercase tracking-widest text-white/50">Experience</p>
                 </div>
                 <div>

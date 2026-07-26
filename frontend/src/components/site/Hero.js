@@ -2,7 +2,7 @@ import { Button } from "../ui/button";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { useSurveyDialog } from "../../context/SurveyDialogContext";
 
-const SKYLINE = "https://images.unsplash.com/photo-1651467606797-e1c660cf3fda?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxkdWJhaSUyMHNreWxpbmUlMjBsdXh1cnl8ZW58MHx8fHwxNzg0MjE4OTUwfDA&ixlib=rb-4.1.0&q=85";
+const OFFICE = "/office/compass-building.jpg";
 
 export default function Hero() {
   const { openSurvey } = useSurveyDialog();
@@ -11,23 +11,23 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-10 items-center">
         <div className="lg:col-span-7 fade-in-up">
           <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#C5A059] mb-6">
-            <span className="w-6 h-px bg-[#C5A059]" /> UAE Business & Visa Experts
+            <span className="w-6 h-px bg-[#C5A059]" /> Project Management & Talent Acquisition
           </p>
           <h1 className="font-serif-display text-5xl sm:text-6xl lg:text-[76px] leading-[1.02] tracking-tight text-[#1A1B1E]">
-            Business Setup & Visa Experts
+            Project Management,
             <br />
-            in the <span className="italic text-[#C5A059]">United Arab Emirates.</span>
+            Talent Acquisition & <span className="italic text-[#C5A059]">Manpower Recruitment.</span>
           </h1>
           <p className="mt-8 max-w-xl text-base text-muted-foreground leading-relaxed">
-            Helping entrepreneurs, professionals, and businesses establish and grow in the UAE — with reliable business setup, visa processing, corporate tax, and manpower solutions under one roof.
+            Helping entrepreneurs, professionals and businesses establish and grow in the UAE — with UAE trade license services, project management, corporate tax, talent acquisition and manpower recruitment under one roof.
           </p>
 
           <ul className="mt-8 grid sm:grid-cols-2 gap-3 max-w-xl">
             {[
               "UAE Trade License Services",
-              "Visa & Immigration Assistance",
-              "Corporate Documentation",
-              "End-to-End Business Support",
+              "Project Management & Legal Documentation",
+              "Corporate Tax & Talent Acquisition",
+              "Manpower Recruitment & Type-in Services",
             ].map((f) => (
               <li key={f} className="flex items-start gap-2 text-sm text-[#2C303A]">
                 <CheckCircle2 className="w-4 h-4 text-[#C5A059] mt-0.5 shrink-0" />
@@ -46,9 +46,9 @@ export default function Hero() {
           </div>
 
           <div className="mt-12 flex items-center gap-8 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            <div><span className="font-serif-display text-3xl text-[#1A1B1E] block leading-none">7+</span>Years experience</div>
+            <div><span className="font-serif-display text-3xl text-[#1A1B1E] block leading-none">6+</span>Years experience</div>
             <div className="w-px h-8 bg-border" />
-            <div><span className="font-serif-display text-3xl text-[#1A1B1E] block leading-none">1000+</span>Drivers served</div>
+            <div><span className="font-serif-display text-3xl text-[#1A1B1E] block leading-none">300+</span>Drivers placed</div>
             <div className="w-px h-8 bg-border" />
             <div><span className="font-serif-display text-3xl text-[#1A1B1E] block leading-none">2027</span>License valid till</div>
           </div>
@@ -56,16 +56,23 @@ export default function Hero() {
 
         <div className="lg:col-span-5 relative">
           <div className="relative aspect-[4/5] overflow-hidden">
-            <img src={SKYLINE} alt="Dubai skyline" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#2C303A]/60 via-transparent to-transparent" />
-            <div className="absolute bottom-6 left-6 right-6 text-white">
+            <img src={OFFICE} alt="Compass Business Park, Al Hamra RAK" className="w-full h-full object-cover" />
+            <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-[#1A1B1E]/70 to-transparent p-6">
               <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Head Office</p>
-              <p className="font-serif-display text-2xl leading-tight mt-1">Compass Co-Working Space,<br/>Al Jazeera Al Hamra, Ras Al Khaimah, UAE</p>
+              <p className="font-serif-display text-2xl leading-tight mt-1 text-white">
+                Compass Co-Working Space,<br/>Al Jazeera Al Hamra, RAK, UAE
+              </p>
             </div>
-          </div>
-          <div className="absolute -bottom-6 -left-6 bg-[#2C303A] text-white p-6 max-w-[220px] hidden lg:block">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Trade License</p>
-            <p className="font-serif-display text-3xl leading-none mt-2">Valid till<br/>March 2027</p>
+            <div className="absolute bottom-0 inset-x-0 bg-[#2C303A]/90 backdrop-blur-sm text-white px-6 py-4 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Trade License</p>
+                <p className="font-serif-display text-lg leading-none mt-1">Valid till March 2027</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Region</p>
+                <p className="font-serif-display text-lg leading-none mt-1">GCC</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -368,7 +368,7 @@ async def get_reviews():
             "name": "Kamal Kumar",
             "rating": 5,
             "date": "7 months ago",
-            "text": "A highly professional immigration service. They made my visa process smooth and completely stress-free. I received regular updates throughout. Highly recommended!",
+            "text": "A highly professional documentation service. They made my UAE placement process smooth and completely stress-free. I received regular updates throughout. Highly recommended!",
             "avatar_color": "#2C303A",
         },
         {
@@ -408,7 +408,7 @@ async def get_reviews():
             "name": "Neha & Rajesh Sharma",
             "rating": 5,
             "date": "4 months ago",
-            "text": "We came on a couple's visa and the entire experience was hassle-free. The documentation was handled by them end-to-end and the medical was booked in advance. Would recommend to anyone.",
+            "text": "We came for a family placement and the entire experience was hassle-free. The documentation was handled by them end-to-end and everything was booked in advance. Would recommend to anyone.",
             "avatar_color": "#C5A059",
         },
         {

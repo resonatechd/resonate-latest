@@ -35,7 +35,7 @@ export default function Nav() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
         <a href="#top" className="flex items-baseline gap-1" data-testid="nav-logo">
           <span className="font-serif-display text-2xl tracking-tight">Resonate</span>
-          <span className="font-serif-display italic text-2xl text-[#C5A059]">.Dubai</span>
+          <span className="font-serif-display italic text-2xl text-[#C5A059]"> Dubai LLC</span>
         </a>
 
         <nav className="hidden md:flex items-center gap-8">
