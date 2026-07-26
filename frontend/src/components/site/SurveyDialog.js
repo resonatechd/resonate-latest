@@ -6,7 +6,7 @@ import { Textarea } from "../ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "../ui/select";
-import { Dialog, DialogContent } from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
 import { CheckCircle2, ClipboardCheck, ArrowRight } from "lucide-react";
 import api, { formatApiError } from "../../lib/api";
 import { toast } from "sonner";
@@ -96,6 +96,10 @@ export default function SurveyDialog() {
         className="p-0 gap-0 max-w-4xl w-[calc(100vw-2rem)] max-h-[92vh] overflow-hidden rounded-none border-0 shadow-2xl"
         data-testid="survey-dialog"
       >
+        <DialogTitle className="sr-only">Free Counselling — Resonate Dubai LLC</DialogTitle>
+        <DialogDescription className="sr-only">
+          Answer a few short questions so a senior consultant can prepare a tailored plan before contacting you.
+        </DialogDescription>
         <div className="grid md:grid-cols-12 max-h-[92vh]">
           <aside className="hidden md:flex md:col-span-4 bg-[#1A1B1E] text-white p-8 flex-col justify-between relative overflow-hidden">
             <div className="absolute inset-0 grain-overlay opacity-30" />
