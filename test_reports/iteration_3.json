@@ -1,0 +1,30 @@
+{
+  "summary": "Iteration 3 bug-fix cycle verified end-to-end. Backend pytest: 12/12 pass (health, reviews x8, questions public seeded 8 + ordered, /questions/all auth guard, questions CRUD create->public visible, update->inactive drops from public, soft delete, survey submit accepts new shape {name,phone,email(empty ok),answers[]}, admin /survey/list returns docs with answers[] intact, ALL 4 /api/vacancies* routes 404). Frontend: (1) Services grid shows exactly 5 reverted services with none of the removed titles; (2) Hero shows the 4 new bullets; (3) #updates heading contains 'Success stories, milestones and testimonials' and does NOT contain 'Recent visas' or 'A running feed'; (4) Free Consultation modal shows exactly ONE lucide-x close icon, Age and Phone render on separate rows (phone y=1574 vs age y=1807), 8 dynamic questions render from /api/questions, end-to-end survey submit works and shows 'You're all set.' + success toast; (5) Admin has EXACTLY 3 tabs (submissions, updates, questions) — no tab-vacancies; Updates tab has NO category dropdown, text-only publish works; Questions tab: Add question with type=Dropdown + options 'Yes\\nNo' saved and appears in table (rows 8 -> 9). All acceptance criteria met.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "SurveyDialog", "issues": ["Accessibility console warning: 'DialogContent requires a DialogTitle for the component to be accessible for screen reader users.' SurveyDialog.js does not render a <DialogTitle>. Wrap the heading in <DialogTitle> or add a VisuallyHidden DialogTitle to silence the a11y violation."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "(Low) Add a DialogTitle (or VisuallyHidden DialogTitle) inside SurveyDialog's DialogContent to fix the Radix a11y console warning."
+  ],
+  "critical_code_review_comments": [
+    "server.py line 324: logger.info(f\"New survey submission: {doc['email']} ({doc['intent']})\") — both fields are now Optional; log will read 'None (None)' for typical new-shape submissions. Cosmetic only, but consider logging len(answers) instead.",
+    "SurveyDialog.js has no <DialogTitle>; Radix logs an accessibility error on every open. Low-risk but violates a11y contract.",
+    "server.py is ~570 lines with routes+models+auth+storage all inline — recommend splitting into routers (auth, survey, questions, updates, files) at next refactor pass.",
+    "CORS still allow_origins='*' with allow_credentials=False — fine for current public API, but must be tightened before adding cookies/JWT-in-cookie.",
+    "/api/files/{path} silently checks 3 collections; a small helper or index would make it clearer and faster."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (12/12 pytest)", "frontend": "100% acceptance criteria (17/17 checks) — 1 minor a11y warning"},
+  "test_credentials": "admin@resonate.dubai / Admin@123 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "TEST_ NewShape survey submission (via API, persists), TEST_ Playwright User survey submission (via UI), TEST_ Text Update Iteration3 update (created then deleted), TEST_ Playwright Question (created then deleted). All create/delete cycles completed cleanly.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 3 complete. All bug-fix acceptance criteria pass. Backend has full CRUD test coverage for /api/questions and vacancy-removed regression. Only remaining nit is the missing DialogTitle in SurveyDialog (a11y console warning). If main agent adds DialogTitle, no retest needed — trivial change.",
+  "rca of the issue": "N/A — iteration 3 fixes verified working; a11y warning is a small Radix a11y check that needs a DialogTitle (or VisuallyHidden wrapper) inside SurveyDialog's DialogContent."
+}

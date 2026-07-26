@@ -176,35 +176,13 @@ class LoginIn(BaseModel):
 
 
 class SurveyIn(BaseModel):
-    # Slide 1 - Personal
     name: str
-    age: Optional[str] = None
     phone: str
-    # Slide 2 - Location
-    state: Optional[str] = None
-    # Slide 3 - Passport
-    has_passport: Optional[str] = None  # yes | no
-    passport_front_path: Optional[str] = None
-    passport_back_path: Optional[str] = None
-    # Slide 4 - Intent
-    intent: str  # visit | business | job | other
-    # Slide 5 - Job / education
-    education: Optional[str] = None
-    education_detail: Optional[str] = None
-    has_experience: Optional[str] = None  # yes | no
-    industry: Optional[str] = None
-    vacancy: Optional[str] = None
-    # Extras / legacy contact
     email: Optional[EmailStr] = None
-    nationality: Optional[str] = None
-    budget: Optional[str] = None
-    timeline: Optional[str] = None
+    answers: List[dict] = []  # [{question_id, label, type, value}]
+    # legacy passthrough (ignored on new submissions)
+    intent: Optional[str] = None
     notes: Optional[str] = None
-    # Legacy
-    location: Optional[str] = None
-    visa_status: Optional[str] = None
-    field_or_type: Optional[str] = None
-    experience_years: Optional[str] = None
 
     @field_validator("email", mode="before")
     @classmethod
@@ -214,9 +192,13 @@ class SurveyIn(BaseModel):
         return v
 
 
-class VacancyIn(BaseModel):
-    title: str
-    description: Optional[str] = ""
+class QuestionIn(BaseModel):
+    label: str
+    help_text: Optional[str] = ""
+    type: str = "text"  # text | textarea | select
+    options: List[str] = []
+    required: bool = False
+    order: int = 0
     is_active: bool = True
 
 
@@ -237,34 +219,36 @@ async def on_startup():
     await db.users.create_index("email", unique=True)
     await db.surveys.create_index("created_at")
     await db.updates.create_index("created_at")
-    await db.vacancies.create_index("created_at")
+    await db.questions.create_index("order")
 
-    # Seed default vacancies if none exist
-    if await db.vacancies.count_documents({}) == 0:
-        defaults = [
-            "Taxi Driver — Sharjah",
-            "Kitchen Helper / Cook — Restaurants (Ajman)",
-            "Waiter / Waitress — Hospitality",
-            "Housekeeping — Hotels",
-            "Delivery Rider — E-commerce",
-            "Truck Driver — Logistics",
-            "Accountant — Corporate Services",
-            "Admin Assistant — Corporate Office",
-            "Sales Executive — Retail / Real Estate",
-            "Digital Marketing Executive",
+    # Seed default counselling questions if none exist
+    if await db.questions.count_documents({}) == 0:
+        now_q = datetime.now(timezone.utc).isoformat()
+        q_defaults = [
+            {"label": "Age", "type": "select", "options": [str(n) for n in range(18, 50)], "required": True, "order": 10, "help_text": "Your current age."},
+            {"label": "Which state are you from?", "type": "select", "options": [
+                "Andhra Pradesh","Assam","Bihar","Chandigarh","Chhattisgarh","Delhi","Goa","Gujarat","Haryana",
+                "Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Odisha",
+                "Punjab","Rajasthan","Tamil Nadu","Telangana","Uttar Pradesh","Uttarakhand","West Bengal",
+                "Jammu & Kashmir","Outside India"
+            ], "required": True, "order": 20, "help_text": "Helps us route to the right regional consultant."},
+            {"label": "Do you have a valid passport?", "type": "select", "options": ["Yes","No"], "required": True, "order": 30, "help_text": ""},
+            {"label": "What are you planning?", "type": "select", "options": [
+                "Visit the UAE (tourism)",
+                "Open a company in the UAE",
+                "Looking for a job in the UAE",
+                "Family / dependent relocation",
+            ], "required": True, "order": 40, "help_text": ""},
+            {"label": "Last education", "type": "select", "options": ["10th","12th","Graduation","Post-Graduation"], "required": False, "order": 50, "help_text": ""},
+            {"label": "Do you have working experience?", "type": "select", "options": ["Yes","No"], "required": False, "order": 60, "help_text": ""},
+            {"label": "Which industry / field?", "type": "text", "options": [], "required": False, "order": 70, "help_text": "e.g. Restaurant, Taxi driver, Retail sales, Accountant, IT…"},
+            {"label": "Anything else we should know?", "type": "textarea", "options": [], "required": False, "order": 80, "help_text": "Optional — timelines, budget, specific vacancy interest, etc."},
         ]
-        now = datetime.now(timezone.utc).isoformat()
-        await db.vacancies.insert_many([
-            {
-                "id": str(uuid.uuid4()),
-                "title": t,
-                "description": "",
-                "is_active": True,
-                "is_deleted": False,
-                "created_at": now,
-            }
-            for t in defaults
+        await db.questions.insert_many([
+            {**q, "id": str(uuid.uuid4()), "is_active": True, "is_deleted": False, "created_at": now_q}
+            for q in q_defaults
         ])
+        logger.info("Seeded default counselling questions")
 
     # Seed admin
     existing = await db.users.find_one({"email": ADMIN_EMAIL})
@@ -422,13 +406,11 @@ async def get_reviews():
     ]
 
 
-@api.get("/vacancies")
-async def list_vacancies_public():
+@api.get("/questions")
+async def list_questions_public():
     docs = (
-        await db.vacancies.find(
-            {"is_deleted": {"$ne": True}, "is_active": True}, {"_id": 0}
-        )
-        .sort("created_at", -1)
+        await db.questions.find({"is_deleted": {"$ne": True}, "is_active": True}, {"_id": 0})
+        .sort("order", 1)
         .to_list(200)
     )
     return docs
@@ -535,31 +517,43 @@ async def delete_update(update_id: str, admin=Depends(require_admin)):
     return {"ok": True}
 
 
-@api.get("/vacancies/all")
-async def list_vacancies_admin(admin=Depends(require_admin)):
+@api.get("/questions/all")
+async def list_questions_admin(admin=Depends(require_admin)):
     docs = (
-        await db.vacancies.find({"is_deleted": {"$ne": True}}, {"_id": 0})
-        .sort("created_at", -1)
+        await db.questions.find({"is_deleted": {"$ne": True}}, {"_id": 0})
+        .sort("order", 1)
         .to_list(500)
     )
     return docs
 
 
-@api.post("/vacancies")
-async def create_vacancy(body: VacancyIn, admin=Depends(require_admin)):
+@api.post("/questions")
+async def create_question(body: QuestionIn, admin=Depends(require_admin)):
     doc = body.model_dump()
     doc["id"] = str(uuid.uuid4())
     doc["is_deleted"] = False
     doc["created_at"] = datetime.now(timezone.utc).isoformat()
-    await db.vacancies.insert_one(doc)
+    await db.questions.insert_one(doc)
     doc.pop("_id", None)
     return doc
 
 
-@api.delete("/vacancies/{vacancy_id}")
-async def delete_vacancy(vacancy_id: str, admin=Depends(require_admin)):
-    res = await db.vacancies.update_one(
-        {"id": vacancy_id}, {"$set": {"is_deleted": True}}
+@api.put("/questions/{question_id}")
+async def update_question(question_id: str, body: QuestionIn, admin=Depends(require_admin)):
+    res = await db.questions.update_one(
+        {"id": question_id, "is_deleted": {"$ne": True}},
+        {"$set": body.model_dump()},
+    )
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Not found")
+    doc = await db.questions.find_one({"id": question_id}, {"_id": 0})
+    return doc
+
+
+@api.delete("/questions/{question_id}")
+async def delete_question(question_id: str, admin=Depends(require_admin)):
+    res = await db.questions.update_one(
+        {"id": question_id}, {"$set": {"is_deleted": True}}
     )
     if res.matched_count == 0:
         raise HTTPException(status_code=404, detail="Not found")

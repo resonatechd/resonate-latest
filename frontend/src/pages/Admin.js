@@ -16,26 +16,190 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "../components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "../components/ui/dialog";
 import { toast } from "sonner";
-import { LogOut, Upload, Trash2, Mail, Phone, Eye, Plus, Briefcase } from "lucide-react";
+import { LogOut, Upload, Trash2, Mail, Phone, Eye, Plus, Pencil, ListChecks } from "lucide-react";
 
+// ---------- Questions Tab ----------
+function QuestionsTab() {
+  const [questions, setQuestions] = useState([]);
+  const [editing, setEditing] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const load = () => {
+    api.get("/questions/all").then((r) => setQuestions(r.data || [])).catch(() => {});
+  };
+  useEffect(() => { load(); }, []);
+
+  const startNew = () => {
+    setEditing({
+      label: "", help_text: "", type: "text", options: [], required: false, order: (questions[questions.length - 1]?.order || 0) + 10, is_active: true,
+    });
+    setDialogOpen(true);
+  };
+  const startEdit = (q) => { setEditing({ ...q }); setDialogOpen(true); };
+
+  const save = async () => {
+    try {
+      const payload = { ...editing };
+      if (payload.type !== "select") payload.options = [];
+      if (editing.id) {
+        await api.put(`/questions/${editing.id}`, payload);
+      } else {
+        await api.post("/questions", payload);
+      }
+      toast.success("Saved");
+      setDialogOpen(false);
+      setEditing(null);
+      load();
+    } catch (err) { toast.error(formatApiError(err)); }
+  };
+
+  const remove = async (id) => {
+    if (!window.confirm("Delete this question?")) return;
+    try {
+      await api.delete(`/questions/${id}`);
+      toast.success("Deleted");
+      load();
+    } catch (err) { toast.error(formatApiError(err)); }
+  };
+
+  return (
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="font-serif-display text-2xl">Counselling Questions</h3>
+          <p className="text-xs text-muted-foreground mt-1">Add, edit or remove the questions shown in the Free Consultation modal. Free-text or dropdown only.</p>
+        </div>
+        <Button onClick={startNew} className="bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none" data-testid="question-add-btn">
+          <Plus className="w-4 h-4 mr-2" /> Add question
+        </Button>
+      </div>
+
+      <Card className="rounded-none border hairline">
+        <Table>
+          <TableHeader className="bg-accent">
+            <TableRow>
+              <TableHead className="w-[80px]">Order</TableHead>
+              <TableHead>Label</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Options</TableHead>
+              <TableHead>Required</TableHead>
+              <TableHead>Active</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {questions.length === 0 && (
+              <TableRow><TableCell colSpan={7} className="text-center py-10 text-muted-foreground">No questions yet — add your first.</TableCell></TableRow>
+            )}
+            {questions.map((q) => (
+              <TableRow key={q.id} data-testid={`question-row-${q.id}`}>
+                <TableCell>{q.order}</TableCell>
+                <TableCell className="font-medium max-w-[280px]">{q.label}</TableCell>
+                <TableCell><Badge variant="outline" className="rounded-none capitalize">{q.type}</Badge></TableCell>
+                <TableCell className="text-xs max-w-[260px] truncate">{(q.options || []).join(", ") || "—"}</TableCell>
+                <TableCell>{q.required ? <Badge className="bg-[#C5A059] text-white">required</Badge> : <span className="text-muted-foreground text-xs">optional</span>}</TableCell>
+                <TableCell>{q.is_active ? <Badge variant="outline" className="border-emerald-500 text-emerald-700">on</Badge> : <Badge variant="outline">off</Badge>}</TableCell>
+                <TableCell className="text-right space-x-1">
+                  <Button variant="ghost" size="icon" onClick={() => startEdit(q)} data-testid={`question-edit-${q.id}`}>
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => remove(q.id)} data-testid={`question-delete-${q.id}`}>
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-lg rounded-none">
+          <DialogHeader>
+            <DialogTitle className="font-serif-display text-2xl">
+              {editing?.id ? "Edit question" : "Add question"}
+            </DialogTitle>
+          </DialogHeader>
+          {editing && (
+            <div className="space-y-4">
+              <div>
+                <Label>Question label <span className="text-destructive">*</span></Label>
+                <Input value={editing.label} onChange={(e) => setEditing({ ...editing, label: e.target.value })} data-testid="question-label-input" placeholder="e.g. What is your last education?" />
+              </div>
+              <div>
+                <Label>Help text <span className="text-muted-foreground">(optional)</span></Label>
+                <Input value={editing.help_text} onChange={(e) => setEditing({ ...editing, help_text: e.target.value })} data-testid="question-help-input" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Type</Label>
+                  <Select value={editing.type} onValueChange={(v) => setEditing({ ...editing, type: v })}>
+                    <SelectTrigger data-testid="question-type-select" className="mt-2"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="text">Free text (single line)</SelectItem>
+                      <SelectItem value="textarea">Free text (multi-line)</SelectItem>
+                      <SelectItem value="select">Dropdown</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Order</Label>
+                  <Input type="number" value={editing.order} onChange={(e) => setEditing({ ...editing, order: parseInt(e.target.value, 10) || 0 })} data-testid="question-order-input" className="mt-2" />
+                </div>
+              </div>
+              {editing.type === "select" && (
+                <div>
+                  <Label>Dropdown options — one per line</Label>
+                  <Textarea
+                    rows={5}
+                    value={(editing.options || []).join("\n")}
+                    onChange={(e) => setEditing({ ...editing, options: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
+                    data-testid="question-options-input"
+                    placeholder="Yes\nNo"
+                  />
+                </div>
+              )}
+              <div className="flex items-center gap-6 pt-2">
+                <label className="flex items-center gap-2 text-sm">
+                  <Switch checked={editing.required} onCheckedChange={(v) => setEditing({ ...editing, required: v })} data-testid="question-required-switch" /> Required
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <Switch checked={editing.is_active} onCheckedChange={(v) => setEditing({ ...editing, is_active: v })} data-testid="question-active-switch" /> Active
+                </label>
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setDialogOpen(false)} className="rounded-none">Cancel</Button>
+                <Button
+                  onClick={save}
+                  disabled={!editing.label.trim()}
+                  className="bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none"
+                  data-testid="question-save-btn"
+                >Save</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+// ---------- Main Admin ----------
 export default function Admin() {
   const { user, logout } = useAuth();
   const [surveys, setSurveys] = useState([]);
   const [updates, setUpdates] = useState([]);
-  const [vacancies, setVacancies] = useState([]);
-  const [form, setForm] = useState({ title: "", description: "", category: "visa" });
+  const [form, setForm] = useState({ title: "", description: "" });
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [newVac, setNewVac] = useState({ title: "", description: "" });
   const [detail, setDetail] = useState(null);
 
   const loadAll = () => {
     api.get("/survey/list").then((r) => setSurveys(r.data || [])).catch(() => {});
     api.get("/updates/list").then((r) => setUpdates(r.data || [])).catch(() => {});
-    api.get("/vacancies/all").then((r) => setVacancies(r.data || [])).catch(() => {});
   };
 
   useEffect(() => { loadAll(); }, []);
@@ -47,11 +211,11 @@ export default function Admin() {
       const fd = new FormData();
       fd.append("title", form.title);
       fd.append("description", form.description);
-      fd.append("category", form.category);
+      fd.append("category", "video");
       if (file) fd.append("media", file);
       await api.post("/updates", fd, { headers: { "Content-Type": "multipart/form-data" } });
-      toast.success("Update published");
-      setForm({ title: "", description: "", category: "visa" });
+      toast.success("Published");
+      setForm({ title: "", description: "" });
       setFile(null);
       loadAll();
     } catch (err) {
@@ -69,30 +233,12 @@ export default function Admin() {
     } catch (err) { toast.error(formatApiError(err)); }
   };
 
-  const addVacancy = async (e) => {
-    e.preventDefault();
-    try {
-      await api.post("/vacancies", { ...newVac, is_active: true });
-      setNewVac({ title: "", description: "" });
-      toast.success("Vacancy added");
-      loadAll();
-    } catch (err) { toast.error(formatApiError(err)); }
-  };
-
-  const removeVacancy = async (id) => {
-    try {
-      await api.delete(`/vacancies/${id}`);
-      toast.success("Removed");
-      loadAll();
-    } catch (err) { toast.error(formatApiError(err)); }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b hairline bg-white">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Resonate.Dubai</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Resonate Dubai LLC</p>
             <h1 className="font-serif-display text-2xl">Admin Dashboard</h1>
           </div>
           <div className="flex items-center gap-3">
@@ -113,8 +259,8 @@ export default function Admin() {
             <TabsTrigger value="updates" data-testid="tab-updates" className="rounded-none">
               Dynamic Updates <Badge className="ml-2 bg-[#2C303A] text-white">{updates.length}</Badge>
             </TabsTrigger>
-            <TabsTrigger value="vacancies" data-testid="tab-vacancies" className="rounded-none">
-              Vacancies <Badge className="ml-2 bg-[#2C303A] text-white">{vacancies.length}</Badge>
+            <TabsTrigger value="questions" data-testid="tab-questions" className="rounded-none">
+              <ListChecks className="w-3.5 h-3.5 mr-1.5" /> Questions
             </TabsTrigger>
           </TabsList>
 
@@ -127,20 +273,13 @@ export default function Admin() {
                       <TableHead>Date</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Contact</TableHead>
-                      <TableHead>Age</TableHead>
-                      <TableHead>State</TableHead>
-                      <TableHead>Intent</TableHead>
-                      <TableHead>Education</TableHead>
-                      <TableHead>Industry / Vacancy</TableHead>
-                      <TableHead>Passport</TableHead>
+                      <TableHead>Answers</TableHead>
                       <TableHead className="text-right">View</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {surveys.length === 0 && (
-                      <TableRow><TableCell colSpan={10} className="text-center py-10 text-muted-foreground">
-                        No submissions yet.
-                      </TableCell></TableRow>
+                      <TableRow><TableCell colSpan={5} className="text-center py-10 text-muted-foreground">No submissions yet.</TableCell></TableRow>
                     )}
                     {surveys.map((s) => (
                       <TableRow key={s.id} data-testid={`submission-row-${s.id}`}>
@@ -150,23 +289,8 @@ export default function Admin() {
                           <div className="flex items-center gap-1"><Phone className="w-3 h-3" />{s.phone}</div>
                           {s.email && <div className="flex items-center gap-1 text-muted-foreground"><Mail className="w-3 h-3" />{s.email}</div>}
                         </TableCell>
-                        <TableCell className="text-xs">{s.age || "—"}</TableCell>
-                        <TableCell className="text-xs">{s.state || "—"}</TableCell>
-                        <TableCell><Badge className="bg-[#C5A059] text-white">{s.intent}</Badge></TableCell>
                         <TableCell className="text-xs">
-                          {s.education || "—"}{s.education_detail ? ` · ${s.education_detail}` : ""}
-                        </TableCell>
-                        <TableCell className="text-xs">
-                          {s.vacancy && <div>{s.vacancy}</div>}
-                          {s.industry && <div className="text-muted-foreground">{s.industry}</div>}
-                          {!s.vacancy && !s.industry && "—"}
-                        </TableCell>
-                        <TableCell className="text-xs">
-                          {s.has_passport === "yes" ? (
-                            <Badge variant="outline" className="border-emerald-500 text-emerald-700">yes</Badge>
-                          ) : s.has_passport === "no" ? (
-                            <Badge variant="outline">no</Badge>
-                          ) : "—"}
+                          <Badge className="bg-[#2C303A] text-white">{(s.answers || []).length} answers</Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" onClick={() => setDetail(s)} data-testid={`view-${s.id}`}>
@@ -185,30 +309,18 @@ export default function Admin() {
             <div className="grid md:grid-cols-5 gap-8">
               <Card className="md:col-span-2 p-6 rounded-none border hairline">
                 <h3 className="font-serif-display text-2xl mb-1">Publish an update</h3>
-                <p className="text-xs text-muted-foreground mb-6">Success story, new company, or promotional video.</p>
+                <p className="text-xs text-muted-foreground mb-6">Category: <strong>Video / Testimonial</strong>. Upload a video or a photo.</p>
                 <form onSubmit={submitUpdate} className="space-y-4" data-testid="update-form">
                   <div>
                     <Label>Title</Label>
                     <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required data-testid="update-title-input" />
                   </div>
                   <div>
-                    <Label>Category</Label>
-                    <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                      <SelectTrigger data-testid="update-category-select"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="visa">Visa issued</SelectItem>
-                        <SelectItem value="company">New company opened</SelectItem>
-                        <SelectItem value="video">Video / Testimonial</SelectItem>
-                        <SelectItem value="announcement">Announcement</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
                     <Label>Description</Label>
                     <Textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} data-testid="update-description-input" />
                   </div>
                   <div>
-                    <Label>Media (image or video)</Label>
+                    <Label>Media — video or photo</Label>
                     <Input type="file" accept="image/*,video/*" onChange={(e) => setFile(e.target.files?.[0] || null)} data-testid="update-file-input" />
                   </div>
                   <Button type="submit" disabled={uploading} className="w-full bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none" data-testid="update-publish-btn">
@@ -229,7 +341,7 @@ export default function Admin() {
                     )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge variant="outline" className="text-[10px]">{u.category}</Badge>
+                        <Badge variant="outline" className="text-[10px]">Video / Testimonial</Badge>
                         <span className="text-[10px] text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</span>
                       </div>
                       <h4 className="font-serif-display text-xl">{u.title}</h4>
@@ -244,58 +356,8 @@ export default function Admin() {
             </div>
           </TabsContent>
 
-          <TabsContent value="vacancies" className="mt-8">
-            <div className="grid md:grid-cols-5 gap-8">
-              <Card className="md:col-span-2 p-6 rounded-none border hairline">
-                <h3 className="font-serif-display text-2xl mb-1">Add a vacancy</h3>
-                <p className="text-xs text-muted-foreground mb-6">Vacancies appear in the counselling survey (job intent).</p>
-                <form onSubmit={addVacancy} className="space-y-4" data-testid="vacancy-form">
-                  <div>
-                    <Label>Title</Label>
-                    <Input value={newVac.title} onChange={(e) => setNewVac({ ...newVac, title: e.target.value })} required data-testid="vacancy-title-input" placeholder="e.g. Sharjah Taxi Driver" />
-                  </div>
-                  <div>
-                    <Label>Description <span className="text-muted-foreground">(optional)</span></Label>
-                    <Textarea rows={3} value={newVac.description} onChange={(e) => setNewVac({ ...newVac, description: e.target.value })} data-testid="vacancy-description-input" />
-                  </div>
-                  <Button type="submit" className="w-full bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none" data-testid="vacancy-add-btn">
-                    <Plus className="w-4 h-4 mr-2" /> Add vacancy
-                  </Button>
-                </form>
-              </Card>
-
-              <div className="md:col-span-3">
-                <Card className="rounded-none border hairline">
-                  <Table>
-                    <TableHeader className="bg-accent">
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {vacancies.length === 0 && (
-                        <TableRow><TableCell colSpan={3} className="text-center py-10 text-muted-foreground">No vacancies.</TableCell></TableRow>
-                      )}
-                      {vacancies.map((v) => (
-                        <TableRow key={v.id} data-testid={`vacancy-row-${v.id}`}>
-                          <TableCell className="font-medium flex items-center gap-2">
-                            <Briefcase className="w-4 h-4 text-[#C5A059]" /> {v.title}
-                          </TableCell>
-                          <TableCell className="text-xs max-w-[300px] truncate">{v.description || "—"}</TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="ghost" size="icon" onClick={() => removeVacancy(v.id)} data-testid={`vacancy-delete-${v.id}`}>
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </Card>
-              </div>
-            </div>
+          <TabsContent value="questions" className="mt-8">
+            <QuestionsTab />
           </TabsContent>
         </Tabs>
       </main>
@@ -306,45 +368,29 @@ export default function Admin() {
             <DialogTitle className="font-serif-display text-2xl">{detail?.name}</DialogTitle>
           </DialogHeader>
           {detail && (
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              {[
-                ["Phone", detail.phone],
-                ["Email", detail.email],
-                ["Age", detail.age],
-                ["State", detail.state],
-                ["Intent", detail.intent],
-                ["Passport", detail.has_passport],
-                ["Education", detail.education],
-                ["Field / Stream", detail.education_detail],
-                ["Has experience", detail.has_experience],
-                ["Industry", detail.industry],
-                ["Vacancy interest", detail.vacancy],
-              ].map(([k, v]) => (
-                <div key={k}>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{k}</p>
-                  <p className="mt-1">{v || "—"}</p>
+            <div className="space-y-4 text-sm">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Phone</p>
+                  <p className="mt-1">{detail.phone}</p>
                 </div>
-              ))}
-              {detail.notes && (
-                <div className="col-span-2">
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Notes</p>
-                  <p className="mt-1 whitespace-pre-wrap">{detail.notes}</p>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Email</p>
+                  <p className="mt-1">{detail.email || "—"}</p>
                 </div>
-              )}
-              {(detail.passport_front_path || detail.passport_back_path) && (
-                <div className="col-span-2 grid grid-cols-2 gap-3">
-                  {detail.passport_front_path && (
-                    <a href={`${API}/files/${detail.passport_front_path}`} target="_blank" rel="noreferrer" className="border hairline p-3 text-xs hover:border-[#C5A059]">
-                      View passport front ↗
-                    </a>
-                  )}
-                  {detail.passport_back_path && (
-                    <a href={`${API}/files/${detail.passport_back_path}`} target="_blank" rel="noreferrer" className="border hairline p-3 text-xs hover:border-[#C5A059]">
-                      View passport back ↗
-                    </a>
-                  )}
+              </div>
+              <div className="pt-4 border-t hairline">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Answers</p>
+                {(detail.answers || []).length === 0 && <p className="text-muted-foreground text-xs">No answers.</p>}
+                <div className="space-y-3">
+                  {(detail.answers || []).map((a, idx) => (
+                    <div key={idx}>
+                      <p className="text-xs text-muted-foreground">{a.label}</p>
+                      <p className="font-medium">{a.value || <span className="text-muted-foreground">—</span>}</p>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
           )}
         </DialogContent>

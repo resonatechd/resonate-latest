@@ -3,32 +3,32 @@ import { Badge } from "../ui/badge";
 import { PlayCircle, Sparkles } from "lucide-react";
 
 const CATEGORY_LABEL = {
-  visa: "Visa Issued",
-  company: "New Company",
-  video: "Video",
-  announcement: "Announcement",
+  visa: "Video / Testimonial",
+  company: "Video / Testimonial",
+  video: "Video / Testimonial",
+  announcement: "Video / Testimonial",
 };
 
 const SEED = [
   {
     id: "seed-1",
-    title: "Investor Visa approved for a Dubai retail founder",
-    description: "Full documentation and approval completed within 12 working days.",
-    category: "visa",
+    title: "Investor onboarded for a Dubai retail founder",
+    description: "Full documentation and onboarding completed within 12 working days.",
+    category: "video",
     created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
   },
   {
     id: "seed-2",
     title: "New Free Zone company opened in RAKEZ",
     description: "Trade license issued for a consulting SME under a general trading activity.",
-    category: "company",
+    category: "video",
     created_at: new Date(Date.now() - 86400000 * 6).toISOString(),
   },
   {
     id: "seed-3",
-    title: "20 Sharjah taxi driver visas processed this week",
-    description: "Ongoing partnership continues — trusted by 1000+ drivers across the emirate.",
-    category: "visa",
+    title: "20 Sharjah taxi drivers placed this week",
+    description: "Ongoing partnership continues — trusted by 300+ drivers placed across the emirate.",
+    category: "video",
     created_at: new Date(Date.now() - 86400000 * 10).toISOString(),
   },
 ];
@@ -55,12 +55,9 @@ export default function DynamicUpdates({ updates = [] }) {
               <Sparkles className="w-3.5 h-3.5" /> Live From Our Desk
             </p>
             <h2 className="font-serif-display text-4xl sm:text-5xl leading-[1.05] tracking-tight max-w-2xl">
-              Recent visas, new companies, and <span className="italic text-[#C5A059]">success stories.</span>
+              Success stories, milestones and <span className="italic text-[#C5A059]">testimonials.</span>
             </h2>
           </div>
-          <p className="max-w-sm text-sm text-muted-foreground">
-            A running feed of what we're processing for clients — updated as our team ships wins.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
