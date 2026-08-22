@@ -5,8 +5,30 @@ export default function CompassOffice() {
   return (
     <section id="compass" className="py-24 bg-background border-b hairline">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <div className="grid lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-5">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-10">
+          {/* Images container: On mobile shows first (order-1 lg:order-2) */}
+          <div className="order-1 lg:order-2 lg:col-span-7">
+            <div className="grid grid-cols-1 gap-4">
+              {/* Building image hidden on mobile to avoid duplication with hero image */}
+              <div className="hidden lg:block relative overflow-hidden aspect-[16/9]">
+                <img src={BUILDING} alt="Compass Business Park building" className="w-full h-full object-cover" />
+                <div className="absolute bottom-4 left-4 bg-[#1A1B1E]/85 text-white px-4 py-2 backdrop-blur-sm">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#C5A059]">Compass Business Park</p>
+                  <p className="text-sm font-medium">Al Hamra, Ras Al Khaimah</p>
+                </div>
+              </div>
+              <div className="relative overflow-hidden aspect-[16/9]">
+                <img src={TEAM} alt="Compass Co-Working team" className="w-full h-full object-cover" />
+                <div className="absolute bottom-4 left-4 bg-[#C5A059] text-white px-4 py-2">
+                  <p className="text-[10px] uppercase tracking-[0.25em]">#MyCompassRAK</p>
+                  <p className="text-sm font-medium">A collaborative business community</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Text & Details container: On mobile shows second (order-2 lg:order-1) after images */}
+          <div className="order-2 lg:order-1 lg:col-span-5">
             <p className="text-[11px] uppercase tracking-[0.3em] text-[#C5A059] mb-4">Our Home Base</p>
             <h2 className="font-serif-display text-4xl sm:text-5xl leading-[1.05] tracking-tight">
               Compass Co-Working, <span className="italic text-[#C5A059]">Al Hamra · RAK.</span>
@@ -33,25 +55,6 @@ export default function CompassOffice() {
                 </div>
               ))}
             </dl>
-          </div>
-
-          <div className="lg:col-span-7">
-            <div className="grid grid-cols-1 gap-4">
-              <div className="relative overflow-hidden aspect-[16/9]">
-                <img src={BUILDING} alt="Compass Business Park building" className="w-full h-full object-cover" />
-                <div className="absolute bottom-4 left-4 bg-[#1A1B1E]/85 text-white px-4 py-2 backdrop-blur-sm">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#C5A059]">Compass Business Park</p>
-                  <p className="text-sm font-medium">Al Hamra, Ras Al Khaimah</p>
-                </div>
-              </div>
-              <div className="relative overflow-hidden aspect-[16/9]">
-                <img src={TEAM} alt="Compass Co-Working team" className="w-full h-full object-cover" />
-                <div className="absolute bottom-4 left-4 bg-[#C5A059] text-white px-4 py-2">
-                  <p className="text-[10px] uppercase tracking-[0.25em]">#MyCompassRAK</p>
-                  <p className="text-sm font-medium">A collaborative business community</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

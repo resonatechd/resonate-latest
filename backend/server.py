@@ -41,7 +41,12 @@ APP_NAME = os.environ.get("APP_NAME", "resonate-dubai")
 
 STORAGE_URL = "https://integrations.emergentagent.com/objstore/api/v1/storage"
 
-client = AsyncIOMotorClient(MONGO_URL)
+try:
+    import certifi
+    client = AsyncIOMotorClient(MONGO_URL, tlsCAFile=certifi.where())
+except Exception:
+    client = AsyncIOMotorClient(MONGO_URL)
+
 db = client[DB_NAME]
 
 logging.basicConfig(
@@ -195,10 +200,11 @@ class SurveyIn(BaseModel):
 class QuestionIn(BaseModel):
     label: str
     help_text: Optional[str] = ""
-    type: str = "text"  # text | textarea | select
+    type: str = "text"  # text | textarea | select | radio
     options: List[str] = []
     required: bool = False
     order: int = 0
+    step: int = 1
     is_active: bool = True
 
 
@@ -219,30 +225,30 @@ async def on_startup():
     await db.users.create_index("email", unique=True)
     await db.surveys.create_index("created_at")
     await db.updates.create_index("created_at")
-    await db.questions.create_index("order")
+    await db.questions.create_index([("step", 1), ("order", 1)])
 
     # Seed default counselling questions if none exist
     if await db.questions.count_documents({}) == 0:
         now_q = datetime.now(timezone.utc).isoformat()
         q_defaults = [
-            {"label": "Age", "type": "select", "options": [str(n) for n in range(18, 50)], "required": True, "order": 10, "help_text": "Your current age."},
+            {"label": "Age", "type": "select", "options": [str(n) for n in range(18, 50)], "required": True, "step": 1, "order": 10, "help_text": "Your current age."},
             {"label": "Which state are you from?", "type": "select", "options": [
                 "Andhra Pradesh","Assam","Bihar","Chandigarh","Chhattisgarh","Delhi","Goa","Gujarat","Haryana",
                 "Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Odisha",
                 "Punjab","Rajasthan","Tamil Nadu","Telangana","Uttar Pradesh","Uttarakhand","West Bengal",
                 "Jammu & Kashmir","Outside India"
-            ], "required": True, "order": 20, "help_text": "Helps us route to the right regional consultant."},
-            {"label": "Do you have a valid passport?", "type": "select", "options": ["Yes","No"], "required": True, "order": 30, "help_text": ""},
-            {"label": "What are you planning?", "type": "select", "options": [
+            ], "required": True, "step": 1, "order": 20, "help_text": "Helps us route to the right regional consultant."},
+            {"label": "Do you have a valid passport?", "type": "radio", "options": ["Yes","No"], "required": True, "step": 2, "order": 30, "help_text": ""},
+            {"label": "What are you planning?", "type": "radio", "options": [
                 "Visit the UAE (tourism)",
                 "Open a company in the UAE",
                 "Looking for a job in the UAE",
                 "Family / dependent relocation",
-            ], "required": True, "order": 40, "help_text": ""},
-            {"label": "Last education", "type": "select", "options": ["10th","12th","Graduation","Post-Graduation"], "required": False, "order": 50, "help_text": ""},
-            {"label": "Do you have working experience?", "type": "select", "options": ["Yes","No"], "required": False, "order": 60, "help_text": ""},
-            {"label": "Which industry / field?", "type": "text", "options": [], "required": False, "order": 70, "help_text": "e.g. Restaurant, Taxi driver, Retail sales, Accountant, IT…"},
-            {"label": "Anything else we should know?", "type": "textarea", "options": [], "required": False, "order": 80, "help_text": "Optional — timelines, budget, specific vacancy interest, etc."},
+            ], "required": True, "step": 2, "order": 40, "help_text": ""},
+            {"label": "Last education", "type": "select", "options": ["10th","12th","Graduation","Post-Graduation"], "required": False, "step": 3, "order": 50, "help_text": ""},
+            {"label": "Do you have working experience?", "type": "radio", "options": ["Yes","No"], "required": False, "step": 3, "order": 60, "help_text": ""},
+            {"label": "Which industry / field?", "type": "text", "options": [], "required": False, "step": 3, "order": 70, "help_text": "e.g. Restaurant, Taxi driver, Retail sales, Accountant, IT…"},
+            {"label": "Anything else we should know?", "type": "textarea", "options": [], "required": False, "step": 3, "order": 80, "help_text": "Optional — timelines, budget, specific vacancy interest, etc."},
         ]
         await db.questions.insert_many([
             {**q, "id": str(uuid.uuid4()), "is_active": True, "is_deleted": False, "created_at": now_q}
@@ -410,7 +416,7 @@ async def get_reviews():
 async def list_questions_public():
     docs = (
         await db.questions.find({"is_deleted": {"$ne": True}, "is_active": True}, {"_id": 0})
-        .sort("order", 1)
+        .sort([("step", 1), ("order", 1)])
         .to_list(200)
     )
     return docs
@@ -521,7 +527,7 @@ async def delete_update(update_id: str, admin=Depends(require_admin)):
 async def list_questions_admin(admin=Depends(require_admin)):
     docs = (
         await db.questions.find({"is_deleted": {"$ne": True}}, {"_id": 0})
-        .sort("order", 1)
+        .sort([("step", 1), ("order", 1)])
         .to_list(500)
     )
     return docs

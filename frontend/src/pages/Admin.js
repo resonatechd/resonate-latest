@@ -34,16 +34,16 @@ function QuestionsTab() {
 
   const startNew = () => {
     setEditing({
-      label: "", help_text: "", type: "text", options: [], required: false, order: (questions[questions.length - 1]?.order || 0) + 10, is_active: true,
+      label: "", help_text: "", type: "text", options: [], required: false, step: 1, order: (questions[questions.length - 1]?.order || 0) + 10, is_active: true,
     });
     setDialogOpen(true);
   };
-  const startEdit = (q) => { setEditing({ ...q }); setDialogOpen(true); };
+  const startEdit = (q) => { setEditing({ ...q, step: q.step || 1 }); setDialogOpen(true); };
 
   const save = async () => {
     try {
       const payload = { ...editing };
-      if (payload.type !== "select") payload.options = [];
+      if (payload.type !== "select" && payload.type !== "radio") payload.options = [];
       if (editing.id) {
         await api.put(`/questions/${editing.id}`, payload);
       } else {
@@ -70,7 +70,7 @@ function QuestionsTab() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="font-serif-display text-2xl">Counselling Questions</h3>
-          <p className="text-xs text-muted-foreground mt-1">Add, edit or remove the questions shown in the Free Consultation modal. Free-text or dropdown only.</p>
+          <p className="text-xs text-muted-foreground mt-1">Manage steps, input types (text, dropdown, radio buttons) and questions for the Free Consultation modal.</p>
         </div>
         <Button onClick={startNew} className="bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none" data-testid="question-add-btn">
           <Plus className="w-4 h-4 mr-2" /> Add question
@@ -81,6 +81,7 @@ function QuestionsTab() {
         <Table>
           <TableHeader className="bg-accent">
             <TableRow>
+              <TableHead className="w-[80px]">Step</TableHead>
               <TableHead className="w-[80px]">Order</TableHead>
               <TableHead>Label</TableHead>
               <TableHead>Type</TableHead>
@@ -92,14 +93,15 @@ function QuestionsTab() {
           </TableHeader>
           <TableBody>
             {questions.length === 0 && (
-              <TableRow><TableCell colSpan={7} className="text-center py-10 text-muted-foreground">No questions yet — add your first.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground">No questions yet — add your first.</TableCell></TableRow>
             )}
             {questions.map((q) => (
               <TableRow key={q.id} data-testid={`question-row-${q.id}`}>
+                <TableCell><Badge variant="secondary" className="rounded-none">Step {q.step || 1}</Badge></TableCell>
                 <TableCell>{q.order}</TableCell>
                 <TableCell className="font-medium max-w-[280px]">{q.label}</TableCell>
                 <TableCell><Badge variant="outline" className="rounded-none capitalize">{q.type}</Badge></TableCell>
-                <TableCell className="text-xs max-w-[260px] truncate">{(q.options || []).join(", ") || "—"}</TableCell>
+                <TableCell className="text-xs max-w-[240px] truncate">{(q.options || []).join(", ") || "—"}</TableCell>
                 <TableCell>{q.required ? <Badge className="bg-[#C5A059] text-white">required</Badge> : <span className="text-muted-foreground text-xs">optional</span>}</TableCell>
                 <TableCell>{q.is_active ? <Badge variant="outline" className="border-emerald-500 text-emerald-700">on</Badge> : <Badge variant="outline">off</Badge>}</TableCell>
                 <TableCell className="text-right space-x-1">
@@ -133,7 +135,15 @@ function QuestionsTab() {
                 <Label>Help text <span className="text-muted-foreground">(optional)</span></Label>
                 <Input value={editing.help_text} onChange={(e) => setEditing({ ...editing, help_text: e.target.value })} data-testid="question-help-input" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label>Step</Label>
+                  <Input type="number" min={1} value={editing.step || 1} onChange={(e) => setEditing({ ...editing, step: parseInt(e.target.value, 10) || 1 })} data-testid="question-step-input" className="mt-2" />
+                </div>
+                <div>
+                  <Label>Order</Label>
+                  <Input type="number" value={editing.order} onChange={(e) => setEditing({ ...editing, order: parseInt(e.target.value, 10) || 0 })} data-testid="question-order-input" className="mt-2" />
+                </div>
                 <div>
                   <Label>Type</Label>
                   <Select value={editing.type} onValueChange={(v) => setEditing({ ...editing, type: v })}>
@@ -142,19 +152,16 @@ function QuestionsTab() {
                       <SelectItem value="text">Free text (single line)</SelectItem>
                       <SelectItem value="textarea">Free text (multi-line)</SelectItem>
                       <SelectItem value="select">Dropdown</SelectItem>
+                      <SelectItem value="radio">Radio buttons (single choice)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label>Order</Label>
-                  <Input type="number" value={editing.order} onChange={(e) => setEditing({ ...editing, order: parseInt(e.target.value, 10) || 0 })} data-testid="question-order-input" className="mt-2" />
-                </div>
               </div>
-              {editing.type === "select" && (
+              {(editing.type === "select" || editing.type === "radio") && (
                 <div>
-                  <Label>Dropdown options — one per line</Label>
+                  <Label>Options — one per line <span className="text-destructive">*</span></Label>
                   <Textarea
-                    rows={5}
+                    rows={4}
                     value={(editing.options || []).join("\n")}
                     onChange={(e) => setEditing({ ...editing, options: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
                     data-testid="question-options-input"

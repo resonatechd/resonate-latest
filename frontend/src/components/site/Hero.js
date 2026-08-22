@@ -27,7 +27,7 @@ export default function Hero() {
               "UAE Trade License Services",
               "Project Management & Legal Documentation",
               "Corporate Tax & Talent Acquisition",
-              "Manpower Recruitment & Type-in Services",
+              "Manpower Recruitment & Typing Services",
             ].map((f) => (
               <li key={f} className="flex items-start gap-2 text-sm text-[#2C303A]">
                 <CheckCircle2 className="w-4 h-4 text-[#C5A059] mt-0.5 shrink-0" />
@@ -63,11 +63,7 @@ export default function Hero() {
                 Compass Co-Working Space,<br/>Al Jazeera Al Hamra, RAK, UAE
               </p>
             </div>
-            <div className="absolute bottom-0 inset-x-0 bg-[#2C303A]/90 backdrop-blur-sm text-white px-6 py-4 flex items-center justify-between">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Trade License</p>
-                <p className="font-serif-display text-lg leading-none mt-1">Valid till March 2027</p>
-              </div>
+            <div className="absolute bottom-0 inset-x-0 bg-[#2C303A]/90 backdrop-blur-sm text-white px-6 py-4 flex items-center justify-end">
               <div className="text-right">
                 <p className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059]">Region</p>
                 <p className="font-serif-display text-lg leading-none mt-1">GCC</p>
