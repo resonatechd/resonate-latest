@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: resonate-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: MONGO_URL
+        value: mongodb+srv://resonate_user:ResonateDb2026!@cluster0.mr7jief.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - key: DB_NAME
+        value: resonate_db
+      - key: JWT_SECRET
+        value: resonate_jwt_secret_key_2026
+      - key: ADMIN_EMAIL
+        value: admin@resonate.dubai
+      - key: ADMIN_PASSWORD
+        value: Admin@123
+      - key: APP_NAME
+        value: resonate-dubai
+      - key: CORS_ORIGINS
+        value: "https://resonatedubai.com,https://www.resonatedubai.com,http://localhost:3000,*"
