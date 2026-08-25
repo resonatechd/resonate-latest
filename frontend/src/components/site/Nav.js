@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Menu, X } from "lucide-react";
 import { useSurveyDialog } from "../../context/SurveyDialogContext";
@@ -52,13 +53,13 @@ export default function Nav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <a
-            href="/admin/login"
+          <Link
+            to="/admin/login"
             className="text-xs uppercase tracking-widest text-muted-foreground hover:text-[#C5A059] px-3 py-2 transition-colors duration-200"
             data-testid="nav-admin-link"
           >
             Admin
-          </a>
+          </Link>
           <Button
             onClick={openSurvey}
             className="bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none h-10 px-5"
@@ -89,14 +90,14 @@ export default function Nav() {
               {l.label}
             </a>
           ))}
-          <a
-            href="/admin/login"
+          <Link
+            to="/admin/login"
             onClick={() => setOpen(false)}
             className="block py-2 text-sm font-medium text-[#C5A059]"
             data-testid="nav-mobile-admin"
           >
             Admin Portal →
-          </a>
+          </Link>
           <Button onClick={() => { setOpen(false); openSurvey(); }} className="w-full bg-[#C5A059] hover:bg-[#b18d47] text-white rounded-none">
             Free Consultation
           </Button>

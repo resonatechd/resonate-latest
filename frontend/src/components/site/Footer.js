@@ -1,4 +1,5 @@
 import { MapPin, Mail, Phone, Building2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const services = [
   "UAE Trade License Services",
@@ -95,7 +96,7 @@ export default function Footer() {
             {company.map((s) => (
               <li key={s}><a href="#about" className="text-white/80 hover:text-[#C5A059] transition-colors">{s}</a></li>
             ))}
-            <li><a href="/admin/login" className="text-white/50 hover:text-[#C5A059] transition-colors" data-testid="footer-admin-link">Admin</a></li>
+            <li><Link to="/admin/login" className="text-white/50 hover:text-[#C5A059] transition-colors" data-testid="footer-admin-link">Admin</Link></li>
           </ul>
         </div>
       </div>

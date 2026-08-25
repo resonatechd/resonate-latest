@@ -7,6 +7,14 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 
+import { useLocation } from "react-router-dom";
+
+function RouteDebugger() {
+  const loc = useLocation();
+  console.log("ROUTE DEBUG:", loc.pathname, "window.location:", window.location.pathname);
+  return null;
+}
+
 function ProtectedRoute({ children }) {
   const { user, ready } = useAuth();
   if (!ready) return <div className="p-10 text-center font-body">Loading…</div>;
@@ -20,12 +28,23 @@ export default function App() {
       <AuthProvider>
         <SurveyDialogProvider>
           <BrowserRouter>
+            <RouteDebugger />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/admin/login" element={<Login />} />
+              <Route path="/admin/login/" element={<Login />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/login/" element={<Login />} />
               <Route
                 path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <Admin />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/"
                 element={
                   <ProtectedRoute>
                     <Admin />
