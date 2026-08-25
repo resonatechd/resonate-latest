@@ -28,9 +28,10 @@ export default function Home() {
   const [updates, setUpdates] = useState([]);
   const [reviews, setReviews] = useState([]);
 
-  const search = typeof window !== "undefined" ? window.location.search : "";
-  const hash = typeof window !== "undefined" ? window.location.hash : "";
-  const showAdmin = search.includes("admin") || search.includes("login") || hash.includes("admin");
+  const pathname = typeof window !== "undefined" ? window.location.pathname.toLowerCase() : "";
+  const search = typeof window !== "undefined" ? window.location.search.toLowerCase() : "";
+  const hash = typeof window !== "undefined" ? window.location.hash.toLowerCase() : "";
+  const showAdmin = pathname.includes("admin") || pathname.includes("login") || search.includes("admin") || search.includes("login") || hash.includes("admin");
 
   useEffect(() => {
     api.get("/updates/list").then((r) => setUpdates(r.data || [])).catch(() => {});
