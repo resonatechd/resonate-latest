@@ -22,7 +22,7 @@ services:
       - key: CORS_ORIGINS
         value: "https://resonatedubai.com,https://www.resonatedubai.com,http://localhost:3000,*"
 
-  - type: static
+  - type: static_site
     name: resonate-frontend
     rootDir: frontend
     buildCommand: yarn && yarn build
