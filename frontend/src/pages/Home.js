@@ -19,14 +19,27 @@ import SurveyDialog from "../components/site/SurveyDialog";
 import Footer from "../components/site/Footer";
 import api from "../lib/api";
 
+import Login from "./Login";
+import Admin from "./Admin";
+import { useAuth } from "../context/AuthContext";
+
 export default function Home() {
+  const { user } = useAuth();
   const [updates, setUpdates] = useState([]);
   const [reviews, setReviews] = useState([]);
+
+  const search = typeof window !== "undefined" ? window.location.search : "";
+  const hash = typeof window !== "undefined" ? window.location.hash : "";
+  const showAdmin = search.includes("admin") || search.includes("login") || hash.includes("admin");
 
   useEffect(() => {
     api.get("/updates/list").then((r) => setUpdates(r.data || [])).catch(() => {});
     api.get("/reviews").then((r) => setReviews(r.data || [])).catch(() => {});
   }, []);
+
+  if (showAdmin) {
+    return user ? <Admin /> : <Login />;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
